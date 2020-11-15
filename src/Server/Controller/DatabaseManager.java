@@ -5,11 +5,9 @@
  */
 package Server.Controller;
 
-import Server.Model.Session;
 import Server.Model.User;
 import Server.Model.UserTable;
 import Server.Model.UserTableData;
-import com.sun.org.apache.xerces.internal.impl.io.UTF8Reader;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -75,22 +73,10 @@ public class DatabaseManager implements Serializable{
         String query = "UPDATE User_Account set isOnline = TRUE where username = '" + user.getAccount_id() + "'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
+        query = "UPDATE User_Account set isPlaying = FALSE where username = '" + user.getAccount_id() + "'";
+        stmt.executeUpdate(query);
     }
     
-    public Session getSession(User user) throws SQLException
-    {
-        String query = "SELECT * FROM User_Account WHERE username = '" + user.getAccount_id() + "'";
-        Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-        rs.next();
-        Session s = new Session();
-        s.setAccount_id(rs.getInt(1));
-        s.setAccountID(user.getAccount_id());
-        s.setIsLogged(true);
-        s.setPoint(rs.getInt(5));
-        s.setIsPlaying(false);
-        return s;
-    }
     public UserTable getUserTable() throws SQLException
     {
         UserTable ut = new UserTable();
@@ -107,6 +93,17 @@ public class DatabaseManager implements Serializable{
         }
         ut.Sort();
         return ut;
+    }
+    public boolean clientNeedUpdate(String username) throws SQLException
+    {
+        String query = "select username from User_Account where (username = '" + username + "' and isOnline = TRUE and isPlaying = FALSE);";
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        if (!rs.next())
+        {
+            return false;
+        }
+        return true;
     }
 }
 /*

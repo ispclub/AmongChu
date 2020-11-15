@@ -40,11 +40,7 @@ public class ConnectThread extends Thread{
     private ServerMessage serverMessage;
     private JFrame parentToShow;
     private Main main;
-    private TableControlThread tct;
-
-    public void setTct(TableControlThread tct) {
-        this.tct = tct;
-    }
+    private String username;
     
     public void setMain(Main main) {
         this.main = main;
@@ -135,13 +131,15 @@ public class ConnectThread extends Thread{
                     case S_OK:
                         //Đăng nhập thành công
                         JOptionPane.showMessageDialog(parentToShow, "Đăng nhập thành công");
-                        main.toLobby((String)(((ServerMessage)o).getData()));
+                        main.toLobby(username, (UserTable)(((ServerMessage)o).getData()));
                         break;
                     case s_FAIL:
+                        username = null;
                         JOptionPane.showMessageDialog(parentToShow, "Tên tài khoản hoặc mật khẩu không đúng!");
                         //lf.showMessage("Tên tài khoản hoặc mật khẩu không đúng!");
                         break;
                     case S_WARN:
+                        username = null;
                         JOptionPane.showMessageDialog(parentToShow, "Tài khoản đã được đăng nhập tại một vị trí khác!");
                         break;
                     default:
@@ -149,7 +147,8 @@ public class ConnectThread extends Thread{
                 }
             } else if (((ServerMessage)o).getRequest() == ServerMessage.REQUEST.TABLEDATA)
             {
-                tct.setUt((UserTable)(((ServerMessage)o).getData()));
+                //setup data to table and point here
+                //tct.setUt((UserTable)(((ServerMessage)o).getData()));
             }
         }
     }
@@ -186,6 +185,7 @@ public class ConnectThread extends Thread{
     }
     public void Login(User x) throws IOException {
         ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGIN, x);
+        username = x.getAccount_id();
         sendObject(cm);
     }
     public void Logout(String user) throws IOException

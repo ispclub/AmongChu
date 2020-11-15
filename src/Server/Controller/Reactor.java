@@ -5,7 +5,9 @@
  */
 package Server.Controller;
 
+import Message.ServerMessage;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
@@ -21,21 +23,28 @@ import java.util.Iterator;
  *
  * @author hoang
  */
-public class Reactor {
+public class Reactor extends Thread implements Serializable{
     private static final int BUFFER_SIZE = 1024;
     private static final int LINGER= 5000;
     private int port;
     private Selector selector;
     private DatabaseManager dbm;
     private ServerSocketChannel listeningSocketChannel;
+    private final Object objectToSend = null;
     public Reactor(int port, DatabaseManager dm)
     {
         this.dbm = dm;
         this.port = port;
     }
-    public void run() throws IOException 
+    @Override
+    public void run() 
     {
-        init();
+        try {
+            init();
+        } catch (IOException ex) {
+            System.out.println("Server khởi tạo thất bại");
+            System.exit(-1);
+        }
         while (true)
         {
             try
@@ -46,8 +55,19 @@ public class Reactor {
                 {
                     SelectionKey key = keys.next();
                     keys.remove();
+                    synchronized (objectToSend)
+                    {
+                        if (objectToSend != null)
+                        {
+                            Client client  = (Client)key.attachment();
+                            if (dbm.clientNeedUpdate(client.gameHandler.getClientName()))
+                                client.gameHandler.addToQueue(objectToSend);
+                        }
+                    }
                     if (!key.isValid())
-                        continue;
+                    {
+                        
+                    }
                     else if (key.isAcceptable())
                     {
                         sayHello(key);
@@ -61,7 +81,8 @@ public class Reactor {
                         sendMessageToClient(key);
                     }
                 }
-            }catch (Exception e)
+                objectToSend = null;
+            }catch (IOException | SQLException e)
             {
                 System.out.println(e);
                 System.exit(-1);
@@ -143,6 +164,14 @@ public class Reactor {
                 gameHandler.sendMsg(msg);
                 gameHandler.messagesToSend.remove();
             }
+        }
+    }
+    public void sendToAll(Object s) 
+    {
+        synchronized (objectToSend)
+        {
+            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, s, ServerMessage.REQUEST.TABLEDATA);
+            objectToSend = sm;
         }
     }
 }

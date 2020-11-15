@@ -50,4 +50,8 @@ public class UserTable implements Serializable{
     {
         listUTD.add(utd);
     }
+    /*public boolean compareTo(UserTable ut)
+    {
+        
+    }*/
 }

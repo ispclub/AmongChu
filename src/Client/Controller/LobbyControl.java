@@ -7,6 +7,7 @@ package Client.Controller;
 
 import Client.ClientMain.Main;
 import Client.View.LobbyForm;
+import Server.Model.UserTable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,18 +22,16 @@ public class LobbyControl {
     private ConnectThread ct;
     private String user;
     private Main main;
-    public LobbyControl(ConnectThread ct, String user, Main main)
+    public LobbyControl(ConnectThread ct, String user, Main main, UserTable ut)
     {
         this.main = main;
         this.user = user;
         this.ct = ct;
         lf = new LobbyForm();
         lf.setVisible(true);
+        lf.setTable(ut);
         lf.addLogoutListener(new LogoutListener());
         // add Table ControlThread and cast it to ConnectThread
-        TableControlThread tct = new TableControlThread(lf.tblUser, ct, main, lf, user);
-        ct.setTct(tct);
-        tct.start();
     }
     private class LogoutListener implements ActionListener
     {

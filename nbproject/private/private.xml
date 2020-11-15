@@ -8,16 +8,15 @@
             <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/ConnectThread.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/User.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/LobbyControl.java</file>
+            <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/TableUpdateThread.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Client/ClientMain/Main.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/UserTableData.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/TableControlThread.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Message/ClientMessage.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/UserTable.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/ServerMain/Main.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/DatabaseManager.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Client/View/LoginForm.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/GameHandler.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/Session.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Message/ServerMessage.java</file>
             <file>file:/C:/Users/hoang/AmongChu/src/Client/View/LobbyForm.java</file>
         </group>

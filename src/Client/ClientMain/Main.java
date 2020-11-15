@@ -8,7 +8,7 @@ package Client.ClientMain;
 import Client.Controller.ConnectThread;
 import Client.Controller.LobbyControl;
 import Client.Controller.LoginControl;
-import java.util.Vector;
+import Server.Model.UserTable;
 
 /**
  *
@@ -29,11 +29,11 @@ public class Main {
         ct.connect("localhost",12346);
         lc = new LoginControl(ct);
     }
-    public void toLobby(String user)
+    public void toLobby(String user, UserTable ut)
     {
         lc.close();
         lc = null;
-        lyc = new LobbyControl(ct, user, this);
+        lyc = new LobbyControl(ct, user, this, ut);
     }
     public void toLogin()
     {

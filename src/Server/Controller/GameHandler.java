@@ -7,7 +7,6 @@ package Server.Controller;
 
 import Message.ClientMessage;
 import Message.ServerMessage;
-import Server.Model.Session;
 import Server.Model.User;
 import Server.Model.UserTable;
 import java.io.ByteArrayInputStream;
@@ -28,17 +27,20 @@ import java.util.Queue;
 public class GameHandler {
     private Reactor reactor;
     private SocketChannel channel;
-    private Session session;
     private DatabaseManager dbm;
     protected final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
     private ByteBuffer msgFromClient = ByteBuffer.allocate(1024);
     private ClientMessage clientMessage;
+    private String clientName;
+
+    public String getClientName() {
+        return clientName;
+    }
     public GameHandler(Reactor r, SocketChannel sc, DatabaseManager dm)
     {
         this.dbm = dm;
         this.reactor = r;
         this.channel = sc;
-        this.session = new Session();
     }
 
     private static Object byteBufferToObject(ByteBuffer byteBuffer) throws IOException, ClassNotFoundException
@@ -83,6 +85,7 @@ public class GameHandler {
         {
             messagesToSend.add(ByteBuffer.wrap(byteArrayOutpuStream.toByteArray()));
         }
+        reactor.sendMessageToClient(channel);
     }
     
     private void handleMessage() {
@@ -98,24 +101,21 @@ public class GameHandler {
                         {
                             System.out.println("Dang nhap thanh cong");
                             dbm.setLogin((User)clientMessage.getData());
-                            this.session = dbm.getSession((User)clientMessage.getData());
-                            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, ((User)clientMessage.getData()).getAccount_id(), ServerMessage.REQUEST.LOGIN);
+                            clientName = ((User)clientMessage.getData()).getAccount_id();
+                            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, dbm.getUserTable(), ServerMessage.REQUEST.LOGIN);
                             addToQueue(sm);
-                            reactor.sendMessageToClient(channel);
                         }
                         else if (temp == 1)
                         {
                             System.out.println("Dang nhap that bai");
                             ServerMessage sm = new ServerMessage(ServerMessage.STATUS.s_FAIL, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
                             addToQueue(sm);
-                            reactor.sendMessageToClient(channel);
                         }
                         else if (temp == 2)
                         {
                             System.out.println("Da dang nhap");
                             ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
                             addToQueue(sm);
-                            reactor.sendMessageToClient(channel);
                         }
                     }   break;
                 case LOGOUT:
@@ -128,7 +128,6 @@ public class GameHandler {
                     UserTable ut = dbm.getUserTable();
                     ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, ut, ServerMessage.REQUEST.TABLEDATA);
                     addToQueue(sm);
-                    reactor.sendMessageToClient(channel);
                     break;
                     // A huge nub here but i don't want to fix it (Perfomance)
                 default:
@@ -146,9 +145,7 @@ public class GameHandler {
     
     public void Logout() throws SQLException
     {
-        if (!this.session.isIsLogged())
-            return;
-        dbm.setLogout(this.session.getAccountID());
+        dbm.setLogout(clientName);
     }
     
 }
