@@ -7,7 +7,6 @@ package Server.Model;
 
 import java.io.Serializable;
 
-
 /**
  *
  * @author hoang

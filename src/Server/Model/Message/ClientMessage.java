@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Message;
+package Server.Model.Message;
 
 import java.io.Serializable;
 
@@ -15,8 +15,7 @@ public class ClientMessage implements Serializable{
     public enum REQUEST
     {
         LOGIN,
-        LOGOUT,
-        TABLEDATA;
+        LOGOUT;
     }
     private REQUEST request;
     private Object data;
@@ -44,5 +43,4 @@ public class ClientMessage implements Serializable{
 
     public ClientMessage() {
     }
-    
 }

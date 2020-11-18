@@ -5,7 +5,7 @@
  */
 package Client.View;
 
-import Server.Model.User;
+import Server.Model.UserAccount;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -182,10 +182,10 @@ public class LoginForm extends javax.swing.JFrame implements ActionListener{
     {
         btnLogin.addActionListener(log);
     }
-    public User getUser()
+    public UserAccount getUser()
     {
-        User user = new User();
-        user.setAccount_id(txtID.getText());
+        UserAccount user = new UserAccount();
+        user.setUsername(txtID.getText());
         user.setPassword(txtPassword.getText());
         return user;
     }

@@ -3,22 +3,25 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/Reactor.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/LoginControl.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/ConnectThread.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/User.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/Controller/LobbyControl.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/TableUpdateThread.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/ClientMain/Main.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/UserTableData.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Message/ClientMessage.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Model/UserTable.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/ServerMain/Main.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/DatabaseManager.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/View/LoginForm.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Server/Controller/GameHandler.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Message/ServerMessage.java</file>
-            <file>file:/C:/Users/hoang/AmongChu/src/Client/View/LobbyForm.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Controller/LobbyControl.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Controller/ServerReactor.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Controller/clientRun.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/View/LoginForm.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Controller/DatabaseManager.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/View/LobbyForm.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/UserTable.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Model/ClientDataEvent.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Controller/serverRun.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Controller/ConnectThread.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Controller/ServerQueueRequest.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/ServerDataEvent.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/Message/ServerMessage.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/UserTableData.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/ChangeRequest.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/Message/ClientMessage.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Controller/ResponseHandler.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Server/Model/UserAccount.java</file>
+            <file>file:/C:/Users/hoang/AMChu/src/Client/Controller/LoginControl.java</file>
         </group>
     </open-files>
 </project-private>

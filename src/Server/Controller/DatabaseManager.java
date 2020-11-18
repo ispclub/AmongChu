@@ -5,10 +5,9 @@
  */
 package Server.Controller;
 
-import Server.Model.User;
+import Server.Model.UserAccount;
 import Server.Model.UserTable;
 import Server.Model.UserTableData;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -19,7 +18,7 @@ import java.sql.Statement;
  *
  * @author hoang
  */
-public class DatabaseManager implements Serializable{
+public class DatabaseManager{
     private String dbUrl = "jdbc:mysql://localhost:3306/ltm";
     private String dbClass = "com.mysql.cj.jdbc.Driver";
     private Connection con;
@@ -41,16 +40,16 @@ public class DatabaseManager implements Serializable{
         stmt.executeUpdate(query);
     }
     
-    public int checkLogin(User user) throws SQLException
+    public int checkLogin(UserAccount user) throws SQLException
     {
-        String query = "SELECT * FROM User_Account WHERE username = '" + user.getAccount_id() + "' AND password = '" + user.getPassword() + "'";
+        String query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername()+ "' AND password = '" + user.getPassword() + "'";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         if (!rs.next())
         {
             return 1;           // Sai tai khoan hoac mat khau
         }
-        query = "SELECT * FROM User_Account WHERE username = '" + user.getAccount_id() + "' AND isOnline = FALSE";
+        query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername()+ "' AND isOnline = FALSE";
         rs = stmt.executeQuery(query);
         if (rs.next())
         {
@@ -68,12 +67,12 @@ public class DatabaseManager implements Serializable{
         stmt.executeUpdate(query);
     }
     
-    public void setLogin(User user) throws SQLException
+    public void setLogin(UserAccount user) throws SQLException
     {
-        String query = "UPDATE User_Account set isOnline = TRUE where username = '" + user.getAccount_id() + "'";
+        String query = "UPDATE User_Account set isOnline = TRUE where username = '" + user.getUsername()+ "'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
-        query = "UPDATE User_Account set isPlaying = FALSE where username = '" + user.getAccount_id() + "'";
+        query = "UPDATE User_Account set isPlaying = FALSE where username = '" + user.getUsername()+ "'";
         stmt.executeUpdate(query);
     }
     
@@ -99,20 +98,6 @@ public class DatabaseManager implements Serializable{
         String query = "select username from User_Account where (username = '" + username + "' and isOnline = TRUE and isPlaying = FALSE);";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
-        if (!rs.next())
-        {
-            return false;
-        }
-        return true;
+        return rs.next();
     }
 }
-/*
-create database ltm;
-CREATE TABLE User_Account (
-    AccountID int NOT NULL AUTO_INCREMENT,
-    username varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
-    PRIMARY KEY (AccountID)
-
-);
- */

@@ -5,198 +5,200 @@
  */
 package Client.Controller;
 
-import Client.ClientMain.Main;
-import Message.ClientMessage;
-import Message.ServerMessage;
-import Server.Model.User;
-import Server.Model.UserTable;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import Server.Model.ChangeRequest;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import java.nio.channels.spi.SelectorProvider;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author hoang
  */
 public class ConnectThread extends Thread{
-    private boolean isConnected;
-    private SocketChannel socketChannel;
-    private InetSocketAddress serverAddress;
     private Selector selector;
-    private final Queue<ByteBuffer> messagesToSend = new ArrayDeque<>();
-    private final ByteBuffer messageFromServer = ByteBuffer.allocate(1024);
-    private volatile boolean timeToSend = false;
-    private ServerMessage serverMessage;
-    private JFrame parentToShow;
-    private Main main;
-    private String username;
-    
-    public void setMain(Main main) {
-        this.main = main;
-    }
-    public void connect(String host, int port)
-    {
-        serverAddress = new InetSocketAddress(host, port);
-        new Thread(this).start();
+    private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
+    private List pendingChanges = new LinkedList();
+    private Map pendingData = new HashMap();
+    private ResponseHandler rspHandler;
+    public ConnectThread(ResponseHandler rspHandler) throws IOException {
+        this.rspHandler = rspHandler;
+        this.selector = this.initSelector();
     }
 
-    public void setParentToShow(JFrame parentToShow) {
-        this.parentToShow = parentToShow;
+    private Selector initSelector() throws IOException {
+        return SelectorProvider.provider().openSelector();
     }
     
-    @Override
-    public void run()
+    public void closeConnect(SocketChannel sc) throws IOException
     {
-        try
+        synchronized (this.pendingChanges)
         {
-            //setup connection
-            socketChannel = SocketChannel.open();
-            socketChannel.configureBlocking(false);
-            socketChannel.connect(serverAddress);
-            isConnected = true;
-            //setup selector
-            selector = Selector.open();
-            socketChannel.register(selector, SelectionKey.OP_CONNECT);
-            //
-            while (isConnected || !messagesToSend.isEmpty())
+            this.pendingChanges.add(new ChangeRequest(sc, ChangeRequest.CLOSE, 0));
+        }
+        this.selector.wakeup();
+    }
+    
+    public void send(byte[] data, SocketChannel socketChannel)
+    {
+        synchronized (this.pendingChanges)
+        {
+            this.pendingChanges.add(new ChangeRequest(socketChannel, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
+            synchronized (this.pendingData)
             {
-                if (timeToSend)
+                List queue = (List) this.pendingData.get(socketChannel);
+                if (queue == null)
                 {
-                    socketChannel.keyFor(selector).interestOps(SelectionKey.OP_WRITE);
-                    timeToSend = false;
+                    queue = new ArrayList();
+                    this.pendingData.put(socketChannel, queue);
                 }
-                selector.select();
-                for (SelectionKey key : selector.selectedKeys())
+                queue.add(ByteBuffer.wrap(data));
+            }
+        }
+        this.selector.wakeup();
+    }
+    @Override
+    public void run() {
+        while (true)
+        {
+            try
+            {
+                synchronized (this.pendingChanges)
                 {
-                    selector.selectedKeys().remove(key);
+                    Iterator changes = this.pendingChanges.iterator();
+                    while (changes.hasNext())
+                    {
+                        ChangeRequest change = (ChangeRequest)changes.next();
+                        switch (change.getType())
+                        {
+                            case ChangeRequest.CHANGEOPS:
+                                SelectionKey key = change.getSocket().keyFor(this.selector);
+                                key.interestOps(change.getOps());
+                                break;
+                            case ChangeRequest.REGISTER:
+                                change.getSocket().register(this.selector, change.getOps());
+                                break;
+                            case ChangeRequest.CLOSE:
+                                change.getSocket().close();
+                                change.getSocket().keyFor(this.selector).cancel();
+                        }
+                        //ChangeRequest change = (ChangeRequest)changes.next();
+                    }
+                    this.pendingChanges.clear();
+                }
+                this.selector.select();
+                Iterator selectedKeys = this.selector.selectedKeys().iterator();
+                while (selectedKeys.hasNext())
+                {
+                    SelectionKey key = (SelectionKey)selectedKeys.next();
+                    selectedKeys.remove();
                     if (!key.isValid())
                     {
                         continue;
-                    } else if (key.isConnectable())
+                    }
+                    if (key.isConnectable())
                     {
-                        makeConnection(key);
-                    } else if (key.isReadable())
+                        this.finishConection(key);
+                    }
+                    if (key.isReadable())
                     {
-                        msgFromServer(key);
-                    } else if (key.isWritable())
+                        this.read(key);
+                    }
+                    if (key.isWritable())
                     {
-                        msgToServer(key);
+                        this.write(key);
                     }
                 }
+            } catch (ClosedChannelException ex) {
+                Logger.getLogger(ConnectThread.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ConnectThread.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (Exception ex) 
-        {
-            JOptionPane.showMessageDialog(parentToShow, "Không thể kết nối tới server \n" + ex.toString());
-            //lf.showMessage("Khong thể kết nối tới server \n" + ex.toString());
-        } 
+        }
     }
 
-    private static Object byteBufferToObject(ByteBuffer byteBuffer) throws IOException, ClassNotFoundException
-    {
-        ByteArrayInputStream byteArrayInputStream;
-        byteArrayInputStream = new ByteArrayInputStream(byteBuffer.array());
-        ObjectInputStream ios = new ObjectInputStream(byteArrayInputStream);
-        return ios.readObject();
-    }
-    
-    private void makeConnection(SelectionKey key) throws IOException {
-        socketChannel.finishConnect();
+    private void finishConection(SelectionKey key) {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+        try {
+            socketChannel.finishConnect();
+        } catch (IOException e) {
+            // Cancel the channel's registration with our selector
+            System.out.println(e);
+            key.cancel();
+            return;
+        }
         key.interestOps(SelectionKey.OP_READ);
     }
 
-    private void msgFromServer(SelectionKey key) throws IOException, ClassNotFoundException {
-        messageFromServer.clear();
-        int bytesInBuffer = socketChannel.read(messageFromServer);
-        if (bytesInBuffer == -1) {
-            throw new IOException("Buffer corrupt");
-        }
-        Object o = byteBufferToObject(messageFromServer);
-        if (o instanceof ServerMessage)
+    private void read(SelectionKey key) throws IOException {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+        this.readBuffer.clear();
+        int numRead;
+        try
         {
-            if (((ServerMessage)o).getRequest() == ServerMessage.REQUEST.LOGIN)
-            {
-                if (null != ((ServerMessage)o).getStatus())
-                switch (((ServerMessage)o).getStatus()) {
-                    case S_OK:
-                        //Đăng nhập thành công
-                        JOptionPane.showMessageDialog(parentToShow, "Đăng nhập thành công");
-                        main.toLobby(username, (UserTable)(((ServerMessage)o).getData()));
-                        break;
-                    case s_FAIL:
-                        username = null;
-                        JOptionPane.showMessageDialog(parentToShow, "Tên tài khoản hoặc mật khẩu không đúng!");
-                        //lf.showMessage("Tên tài khoản hoặc mật khẩu không đúng!");
-                        break;
-                    case S_WARN:
-                        username = null;
-                        JOptionPane.showMessageDialog(parentToShow, "Tài khoản đã được đăng nhập tại một vị trí khác!");
-                        break;
-                    default:
-                        break;
-                }
-            } else if (((ServerMessage)o).getRequest() == ServerMessage.REQUEST.TABLEDATA)
-            {
-                //setup data to table and point here
-                //tct.setUt((UserTable)(((ServerMessage)o).getData()));
-            }
+            numRead = socketChannel.read(this.readBuffer);
+        }catch (IOException ex)
+        {
+            key.cancel();
+            socketChannel.close();
+            //add thông báo here
+            return;
         }
+        if (numRead == -1)
+        {
+            key.channel().close();
+            key.cancel();
+            //add thông báo here
+            return;
+        }
+        rspHandler.processData(this, socketChannel, this.readBuffer.array(), numRead);
     }
 
-    private void msgToServer(SelectionKey key) throws IOException {
-        ByteBuffer msg;
-        synchronized (messagesToSend)
-        {
-            while ((msg = messagesToSend.peek()) != null)
-            {
-                socketChannel.write(msg);
-                if (msg.hasRemaining())
-                {
-                    return;
+    private void write(SelectionKey key) throws IOException {
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+
+        synchronized (this.pendingData) {
+            List queue = (List) this.pendingData.get(socketChannel);
+
+            while (!queue.isEmpty()) {
+                ByteBuffer buf = (ByteBuffer) queue.get(0);
+                socketChannel.write(buf);
+                if (buf.remaining() > 0) {
+                    //exception here
+                    break;
                 }
-                messagesToSend.remove();
+                queue.remove(0);
             }
-            key.interestOps(SelectionKey.OP_READ);
+            if (queue.isEmpty()) {
+                key.interestOps(SelectionKey.OP_READ);
+            }
         }
     }
     
-    private void sendObject(Object o) throws IOException
+    public SocketChannel initConnection(InetAddress hostAddress, int port) throws IOException
     {
-        ByteArrayOutputStream byteArrayOutpuStream = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(byteArrayOutpuStream);
-        oos.writeObject(o);
-        oos.flush();
-        synchronized (messagesToSend)
+        SocketChannel socketChannel = SocketChannel.open();
+        socketChannel.configureBlocking(false);
+        socketChannel.connect(new InetSocketAddress(hostAddress, port));
+        synchronized(this.pendingChanges)
         {
-            messagesToSend.add(ByteBuffer.wrap(byteArrayOutpuStream.toByteArray()));
+            this.pendingChanges.add(new ChangeRequest(socketChannel, ChangeRequest.REGISTER, SelectionKey.OP_CONNECT));
         }
-        timeToSend = true;
-        selector.wakeup();
-    }
-    public void Login(User x) throws IOException {
-        ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGIN, x);
-        username = x.getAccount_id();
-        sendObject(cm);
-    }
-    public void Logout(String user) throws IOException
-    {
-        ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGOUT, user);
-        sendObject(cm);
-    }
-
-    public void getUserTable() throws IOException {
-        ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.TABLEDATA, null);
-        sendObject(cm);
+        this.selector.wakeup();
+        return socketChannel;
     }
     
 }

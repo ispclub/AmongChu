@@ -5,33 +5,43 @@
  */
 package Client.Controller;
 
-import Client.ClientMain.Main;
 import Client.View.LobbyForm;
+import Server.Model.Message.ClientMessage;
 import Server.Model.UserTable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.channels.SocketChannel;
 
 /**
  *
  * @author hoang
  */
 public class LobbyControl {
-    private String host;
-    private int port;
-    private LobbyForm lf = null;
+    private String username;
     private ConnectThread ct;
-    private String user;
-    private Main main;
-    public LobbyControl(ConnectThread ct, String user, Main main, UserTable ut)
-    {
-        this.main = main;
-        this.user = user;
+    private clientRun main;
+    private LobbyForm lf = null;
+    private SocketChannel sk = null;
+    public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk) {
+        this.username = username;
+        this.sk = sk;
         this.ct = ct;
+        this.main = main;
         lf = new LobbyForm();
+        lf.setLabelName(username);
         lf.setVisible(true);
         lf.setTable(ut);
         lf.addLogoutListener(new LogoutListener());
-        // add Table ControlThread and cast it to ConnectThread
+    }
+    private static byte[] serialize(Object obj) throws IOException 
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
     }
     private class LogoutListener implements ActionListener
     {
@@ -39,7 +49,9 @@ public class LobbyControl {
         public void actionPerformed(ActionEvent e) {
             try
             {
-                ct.Logout(user);
+                //ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGOUT, null);
+                //ct.send(serialize(cm), sk);
+                ct.closeConnect(sk);
                 main.toLogin();
             }catch (Exception ex)
             {
@@ -47,7 +59,6 @@ public class LobbyControl {
             }
         }
     }
-
     @Override
     protected void finalize()
     {

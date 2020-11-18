@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Message;
+package Server.Model.Message;
 
 import java.io.Serializable;
 
@@ -15,7 +15,7 @@ public class ServerMessage implements Serializable{
     public enum STATUS 
     {
         S_OK,
-        s_FAIL,
+        S_FAIL,
         S_WARN;
     }
     public enum ACTION
