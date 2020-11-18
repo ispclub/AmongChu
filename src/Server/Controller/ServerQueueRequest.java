@@ -17,14 +17,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -33,7 +30,6 @@ import java.util.logging.Logger;
 public class ServerQueueRequest implements Runnable{
     private final List queue = new LinkedList();
     private final Map clientName = new HashMap();
-    private Connection con;
     private DatabaseManager dbm;
     
     private Object byteBufferToObject(ByteBuffer b) throws IOException, ClassNotFoundException

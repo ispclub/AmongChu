@@ -9,7 +9,6 @@ import Server.Model.ChangeRequest;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -27,21 +26,24 @@ import java.util.Map;
  *
  * @author hoang
  */
-public class ServerReactor implements Runnable {
+public class ServerReactor extends Thread {
 
     private InetAddress interfaceToBind;
-    private int port;
+    private int port1, port2;
     private ServerQueueRequest sqr;
     private Selector selector;
     private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
-    private ServerSocketChannel serverChannel;
+    private ServerSocketChannel serverChannel, tableChannel;
     private List pendingChange = new LinkedList();
     private Map pendingData = new HashMap();
-
-    public ServerReactor(InetAddress interfaceToBind, int port, ServerQueueRequest sqr) throws IOException {
+    private ServerTableControl stc;
+    
+    public ServerReactor(InetAddress interfaceToBind, int port1, int port2, ServerQueueRequest sqr, ServerTableControl stc) throws IOException {
         this.interfaceToBind = interfaceToBind;
-        this.port = port;
+        this.port1 = port1;
+        this.port2 = port2;
         this.sqr = sqr;
+        this.stc = stc;
         this.selector = this.initSelector();
     }
 
@@ -49,9 +51,15 @@ public class ServerReactor implements Runnable {
         Selector socketSelector = SelectorProvider.provider().openSelector();
         this.serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
-        InetSocketAddress isa = new InetSocketAddress(this.interfaceToBind, this.port);
+        InetSocketAddress isa = new InetSocketAddress(this.interfaceToBind, this.port1);
         serverChannel.socket().bind(isa);
         serverChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
+        //
+        this.tableChannel = ServerSocketChannel.open();
+        tableChannel.configureBlocking(false);
+        InetSocketAddress isa2 = new InetSocketAddress(this.interfaceToBind, this.port2);
+        tableChannel.socket().bind(isa2);
+        tableChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
         return socketSelector;
     }
 
@@ -120,9 +128,12 @@ public class ServerReactor implements Runnable {
     private void accept(SelectionKey key) throws IOException {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
         SocketChannel socketChannel = serverSocketChannel.accept();
-        Socket socket = socketChannel.socket();
+        //Socket socket = socketChannel.socket();
         socketChannel.configureBlocking(false);
-
+        if (socketChannel.socket().getLocalPort()== this.port2)
+        {
+            stc.addToList(this, socketChannel);
+        }
         socketChannel.register(this.selector, SelectionKey.OP_READ);
 
         //need to create new game handler here

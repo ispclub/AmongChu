@@ -15,7 +15,11 @@ import java.sql.SQLException;
 public class serverRun {
     public static void main(String[] args) throws SQLException, IOException {
         ServerQueueRequest sqr = new ServerQueueRequest();
+        ServerTableControl stc = new ServerTableControl();
+        ServerReactor sr = new ServerReactor(null, 12346, 12347, sqr, stc);
         new Thread(sqr).start();
-        new Thread(new ServerReactor(null, 12346, sqr)).start();
+        stc.setSr(sr);
+        sr.start();
+        stc.start();
     }
 }
