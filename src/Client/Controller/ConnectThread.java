@@ -93,7 +93,7 @@ public class ConnectThread extends Thread{
                                 break;
                             case ChangeRequest.CLOSE:
                                 change.getSocket().close();
-                                change.getSocket().keyFor(this.selector).cancel();
+                                //change.getSocket().keyFor(this.selector).cancel();
                         }
                         //ChangeRequest change = (ChangeRequest)changes.next();
                     }

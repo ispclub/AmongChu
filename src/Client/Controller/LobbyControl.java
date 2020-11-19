@@ -6,7 +6,6 @@
 package Client.Controller;
 
 import Client.View.LobbyForm;
-import Server.Model.Message.ClientMessage;
 import Server.Model.UserTable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +24,8 @@ public class LobbyControl {
     private clientRun main;
     private LobbyForm lf = null;
     private SocketChannel sk = null;
-    public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk) {
+    private ResponseHandler rh;
+    public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk, ResponseHandler rh) {
         this.username = username;
         this.sk = sk;
         this.ct = ct;
@@ -34,6 +34,7 @@ public class LobbyControl {
         lf.setLabelName(username);
         lf.setVisible(true);
         lf.setTable(ut);
+        rh.setFrameToShow(lf);
         lf.addLogoutListener(new LogoutListener());
     }
     private static byte[] serialize(Object obj) throws IOException 
@@ -52,12 +53,21 @@ public class LobbyControl {
                 //ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGOUT, null);
                 //ct.send(serialize(cm), sk);
                 ct.closeConnect(sk);
+                Thread.sleep(100);
                 main.toLogin();
             }catch (Exception ex)
             {
                 System.out.println(ex);
             }
         }
+    }
+    private class ChallengeListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+        }
+        
     }
     @Override
     protected void finalize()

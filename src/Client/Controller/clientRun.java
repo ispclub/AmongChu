@@ -18,6 +18,7 @@ public class clientRun {
     private ResponseHandler rsp = null;
     private LoginControl lc = null;
     private SocketChannel socketChannelMain = null;
+    private SocketChannel socketChannelTable = null;
 
     public void setSocketChannelMain(SocketChannel socketChannelMain) {
         this.socketChannelMain = socketChannelMain;
@@ -35,19 +36,25 @@ public class clientRun {
         //ct.initConnection(null, 12346);
         toLogin();
     }
-    public void toLogin()
+    public void toLogin() throws IOException
     {
         if (lyc != null)
         {
             lyc.close();
             lyc = null;
         }
+        if (socketChannelTable != null)
+        {
+            ct.closeConnect(socketChannelTable);
+            socketChannelTable = null;
+        }
         lc = new LoginControl(ct, this, rsp);
     }
-    public void toLobby(String username, UserTable ut)
+    public void toLobby(String username, UserTable ut) throws IOException
     {
         lc.close();
         lc = null;
-        lyc = new LobbyControl(username, ct, this, ut, socketChannelMain);
+        lyc = new LobbyControl(username, ct, this, ut, socketChannelMain, rsp);
+        socketChannelTable = ct.initConnection(null, 12347);
     }
 }

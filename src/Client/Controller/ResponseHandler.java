@@ -6,6 +6,7 @@
 package Client.Controller;
 
 import Client.Model.ClientDataEvent;
+import Client.View.LobbyForm;
 import Client.View.LoginForm;
 import Server.Model.Message.ServerMessage;
 import Server.Model.UserTable;
@@ -81,6 +82,12 @@ public class ResponseHandler implements Runnable
                                 break;
                             case S_FAIL:
                                 JOptionPane.showMessageDialog(frameToShow, "Tài khoản hoặc mật khẩu không chính xác");
+                        }
+                    } else if (sm.getRequest() == ServerMessage.REQUEST.TABLEDATA)
+                    {
+                        if (frameToShow instanceof LobbyForm)
+                        {
+                            ((LobbyForm)frameToShow).setTable((UserTable)(sm.getData()));
                         }
                     }
                 }

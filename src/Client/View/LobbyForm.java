@@ -277,4 +277,12 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
         this.name = name;
         labelName.setText(name);
     }
+    public String getUserNameSelectedRow()
+    {
+        int row = -1;
+        if ((row = tblUser.getSelectedRow()) == -1)
+            return null;
+        DefaultTableModel tbm = (DefaultTableModel)tablemodel;
+        return (String)(tblUser.getValueAt(row, 0));
+    }
 }

@@ -132,7 +132,7 @@ public class ServerReactor extends Thread {
         socketChannel.configureBlocking(false);
         if (socketChannel.socket().getLocalPort()== this.port2)
         {
-            stc.addToList(this, socketChannel);
+            stc.addToList(socketChannel);
         }
         socketChannel.register(this.selector, SelectionKey.OP_READ);
 
@@ -148,6 +148,12 @@ public class ServerReactor extends Thread {
         } catch (IOException ex) {
             key.cancel();
             socketChannel.close();
+            if (socketChannel.socket().getLocalPort() == this.port2)
+            {
+                //remove from ServerTableControl
+                stc.removeFromList(socketChannel);
+                return;
+            }
             //remove client online status from database
             this.sqr.processData(this, socketChannel, null, -1);
             System.out.println("Client disconnected");
@@ -156,9 +162,15 @@ public class ServerReactor extends Thread {
         if (numRead == -1) {
             key.cancel();
             socketChannel.close();
+            if (socketChannel.socket().getLocalPort() == this.port2)
+            {
+                //remove from ServerTableControl
+                stc.removeFromList(socketChannel);
+                return;
+            }
             System.out.println("Client disconnected");
-            //remove client online status from database
             this.sqr.processData(this, socketChannel, null, -1);
+            //remove client online status from database
             return;
         }
         this.sqr.processData(this, socketChannel, this.readBuffer.array(), numRead);

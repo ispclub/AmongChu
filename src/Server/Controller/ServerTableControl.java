@@ -5,6 +5,7 @@
  */
 package Server.Controller;
 
+import Server.Model.Message.ServerMessage;
 import Server.Model.ServerDataEvent;
 import Server.Model.UserTable;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +16,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -33,9 +36,16 @@ public class ServerTableControl extends Thread {
         this.sr = sr;
     }
 
-    public void addToList(ServerReactor aThis, SocketChannel socketChannel) {
+    public void addToList(SocketChannel socketChannel) {
         synchronized (list) {
             list.add(socketChannel);
+            list.notify();
+        }
+    }
+    public void removeFromList(SocketChannel socketChannel)
+    {
+        synchronized (list) {
+            list.remove(socketChannel);
             list.notify();
         }
     }
@@ -62,14 +72,17 @@ public class ServerTableControl extends Thread {
                 } catch (SQLException ex) {
                     System.out.println(ex);
                 }
+                ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, ut, ServerMessage.REQUEST.TABLEDATA);
+                byte[] dta = null;
+                try {
+                    dta = serialize(sm);
+                } catch (IOException ex) {
+                    System.out.println(ex);
+                }
                 Iterator it = list.iterator();
                 while (it.hasNext())
                 {
-                    try {
-                        sr.send((SocketChannel)(it.next()), serialize(ut));
-                    } catch (IOException ex) {
-                        System.out.println(ex);
-                    }
+                    sr.send((SocketChannel)(it.next()),dta);
                 }
             }
         }
