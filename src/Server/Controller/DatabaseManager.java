@@ -93,9 +93,16 @@ public class DatabaseManager{
         ut.Sort();
         return ut;
     }
-    public boolean clientNeedUpdate(String username) throws SQLException
+    public boolean checkIsLogin(String user) throws SQLException
     {
-        String query = "select username from User_Account where (username = '" + username + "' and isOnline = TRUE and isPlaying = FALSE);";
+        String query = "select username from User_Account where isOnline = TRUE;";
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        return rs.next();
+    }
+    public boolean checkIsPlaying(String user) throws SQLException
+    {
+        String query = "select username from User_Account where isPlaying = TRUE;";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         return rs.next();

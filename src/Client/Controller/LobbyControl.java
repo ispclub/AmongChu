@@ -6,6 +6,7 @@
 package Client.Controller;
 
 import Client.View.LobbyForm;
+import Server.Model.Message.ClientMessage;
 import Server.Model.UserTable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -36,6 +39,7 @@ public class LobbyControl {
         lf.setTable(ut);
         rh.setFrameToShow(lf);
         lf.addLogoutListener(new LogoutListener());
+        lf.addChallengeListener(new ChallengeListener());
     }
     private static byte[] serialize(Object obj) throws IOException 
     {
@@ -61,11 +65,18 @@ public class LobbyControl {
             }
         }
     }
+    
     private class ChallengeListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e) {
-            
+            String user = lf.getUserNameSelectedRow();
+            ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
+            try {
+                ct.send(serialize(sm), sk);
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
         
     }

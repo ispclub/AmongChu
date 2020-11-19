@@ -56,7 +56,7 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
         labelPoint = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblUser = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        btnChallenge = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
@@ -117,9 +117,9 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
             tblUser.getColumnModel().getColumn(2).setResizable(false);
         }
 
-        jButton1.setBackground(new java.awt.Color(0, 0, 0));
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Thách đấu");
+        btnChallenge.setBackground(new java.awt.Color(0, 0, 0));
+        btnChallenge.setForeground(new java.awt.Color(255, 255, 255));
+        btnChallenge.setText("Thách đấu");
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -149,7 +149,7 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
                             .addComponent(labelPoint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
+                            .addComponent(btnChallenge)
                             .addComponent(btnLogout))
                         .addGap(15, 15, 15))))
         );
@@ -163,7 +163,7 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
+                            .addComponent(btnChallenge)
                             .addComponent(labelName, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -216,8 +216,8 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnChallenge;
     private javax.swing.JButton btnLogout;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
@@ -233,6 +233,10 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
     public void addLogoutListener(ActionListener log)
     {
         btnLogout.addActionListener(log);
+    }
+    public void addChallengeListener(ActionListener log)
+    {
+        btnChallenge.addActionListener(log);
     }
     public void setTable(UserTable ut)
     {

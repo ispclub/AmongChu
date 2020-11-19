@@ -26,7 +26,7 @@ public class ServerMessage implements Serializable{
     public enum REQUEST
     {
         LOGIN,
-        LOGOUT,
+        CHALLENGE,
         TABLEDATA;
     }
     private STATUS status;
