@@ -18,10 +18,13 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
@@ -75,7 +78,36 @@ public class ServerQueueRequest implements Runnable {
     public ServerQueueRequest() throws SQLException {
         dbm = new DatabaseManager();
     }
-
+    private void addToRequestMap(String a, String b)
+    {
+        Set set = (Set)Match.get(a);
+        if (set == null)
+        {
+            set = new HashSet();
+            this.Match.put(a, set);   
+        }
+        set.add(b);
+    }
+    private void removeFromRequestMap(String user)
+    {
+        this.Match.remove(user);
+    }
+    private boolean needCreateMatch(String currentUser, String otherUser)
+    {
+        Set array = (Set)this.Match.get(otherUser);
+        if (array == null)
+        {
+            return false;
+        }
+        if (array.contains(currentUser))
+        {
+            //remove all request
+            this.Match.remove(currentUser);
+            this.Match.remove(otherUser);
+            return true;
+        }
+        return false;
+    }
     @Override
     public void run() {
         ServerDataEvent dataEvent;
@@ -99,6 +131,7 @@ public class ServerQueueRequest implements Runnable {
                 } catch (SQLException ex) {
                     System.out.println("Set Logout thất bại");
                 }
+                removeFromRequestMap(user);
                 clientName.removeValue(dataEvent.getSocket());
                 System.out.println("Client đăng xuất thành công");
                 continue;
@@ -149,11 +182,18 @@ public class ServerQueueRequest implements Runnable {
                         } else {
                             if (dbm.checkIsLogin(userToChallenge) == true) {
                                 if (dbm.checkIsPlaying(userToChallenge) == false) {
-                                    //Send request and if ok -> make challenge
-                                    SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
-                                    sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, currentUser, ServerMessage.REQUEST.CHALLENGE);
-                                    dataEvent.getServerReactor().send(sc, serialize(sm));
-                                    Match.put(currentUser, userToChallenge);
+                                    // check if the userToChallenge is the one who request first
+                                    if (needCreateMatch(currentUser, userToChallenge))
+                                    {
+                                        //Create a match here
+                                        System.out.println("Tạo trận đấu");
+                                    }else{
+                                        SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
+                                        sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, currentUser, ServerMessage.REQUEST.CHALLENGE);
+                                        dataEvent.getServerReactor().send(sc, serialize(sm));
+                                        addToRequestMap(currentUser, userToChallenge);
+                                    }
+                                    
                                 } else {
                                     sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Người chơi đã trong trận đấu khác", ServerMessage.REQUEST.CHALLENGE);
                                     dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));

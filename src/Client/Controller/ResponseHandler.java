@@ -8,7 +8,10 @@ package Client.Controller;
 import Client.Model.ClientDataEvent;
 import Client.View.LobbyForm;
 import Client.View.LoginForm;
+import Client.View.RequestForm;
+import Server.Model.Message.ClientMessage;
 import Server.Model.Message.ServerMessage;
+import Server.Model.UserAccount;
 import Server.Model.UserTable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,7 +30,11 @@ public class ResponseHandler implements Runnable
 {
     private JFrame frameToShow;
     private clientRun main;
+    private LobbyControl lc;
 
+    public void setLc(LobbyControl lc) {
+        this.lc = lc;
+    }
     public void setMain(clientRun main) {
         this.main = main;
     }
@@ -69,26 +76,38 @@ public class ResponseHandler implements Runnable
                 if (o instanceof ServerMessage)
                 {
                     ServerMessage sm = (ServerMessage)o;
-                    if (sm.getRequest() == ServerMessage.REQUEST.LOGIN)
-                    {
-                        switch (sm.getStatus())
-                        {
-                            case S_OK:
-                                JOptionPane.showMessageDialog(frameToShow, "Đăng nhập thành công");
-                                main.toLobby(((LoginForm)frameToShow).getUser().getUsername(), (UserTable)(sm.getData()));
-                                break;
-                            case S_WARN:
-                                JOptionPane.showMessageDialog(frameToShow, "Tài khoản đã đăng nhập ở vị trí khác");
-                                break;
-                            case S_FAIL:
-                                JOptionPane.showMessageDialog(frameToShow, "Tài khoản hoặc mật khẩu không chính xác");
-                        }
-                    } else if (sm.getRequest() == ServerMessage.REQUEST.TABLEDATA)
-                    {
-                        if (frameToShow instanceof LobbyForm)
-                        {
-                            ((LobbyForm)frameToShow).setTable((UserTable)(sm.getData()));
-                        }
+                    if (null != sm.getRequest())
+                    switch (sm.getRequest()) {
+                        case LOGIN:
+                            switch (sm.getStatus())
+                            {
+                                case S_OK:
+                                    JOptionPane.showMessageDialog(frameToShow, "Đăng nhập thành công");
+                                    main.toLobby(((LoginForm)frameToShow).getUser().getUsername(), (UserTable)(sm.getData()));
+                                    break;
+                                case S_WARN:
+                                    JOptionPane.showMessageDialog(frameToShow, "Tài khoản đã đăng nhập ở vị trí khác");
+                                    break;
+                                case S_FAIL:
+                                    JOptionPane.showMessageDialog(frameToShow, "Tài khoản hoặc mật khẩu không chính xác");
+                            }   break;
+                        case TABLEDATA:
+                            if (frameToShow instanceof LobbyForm)
+                            {
+                                ((LobbyForm)frameToShow).setTable((UserTable)(sm.getData()));
+                            }   break;
+                        case CHALLENGE:
+                            if ((sm.getStatus() == ServerMessage.STATUS.S_FAIL) && (sm.getAction() == ServerMessage.ACTION.MESSAGE_BOX))
+                            {
+                                JOptionPane.showMessageDialog(frameToShow, sm.getData());
+                            }
+                            else if (sm.getStatus() == ServerMessage.STATUS.S_WARN)
+                            {
+                                lc.newRequest((String)(sm.getData()));
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             } catch (IOException ex) {

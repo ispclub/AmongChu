@@ -55,6 +55,7 @@ public class clientRun {
         lc.close();
         lc = null;
         lyc = new LobbyControl(username, ct, this, ut, socketChannelMain, rsp);
+        rsp.setLc(lyc);
         socketChannelTable = ct.initConnection(null, 12347);
     }
 }

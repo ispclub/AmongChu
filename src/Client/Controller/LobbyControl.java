@@ -6,6 +6,7 @@
 package Client.Controller;
 
 import Client.View.LobbyForm;
+import Client.View.RequestForm;
 import Server.Model.Message.ClientMessage;
 import Server.Model.UserTable;
 import java.awt.event.ActionEvent;
@@ -14,8 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
 
 /**
  *
@@ -28,6 +28,7 @@ public class LobbyControl {
     private LobbyForm lf = null;
     private SocketChannel sk = null;
     private ResponseHandler rh;
+    private ArrayList requestList = new ArrayList();
     public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk, ResponseHandler rh) {
         this.username = username;
         this.sk = sk;
@@ -48,6 +49,8 @@ public class LobbyControl {
         os.writeObject(obj);
         return out.toByteArray();
     }
+
+    
     private class LogoutListener implements ActionListener
     {
         @Override
@@ -79,6 +82,29 @@ public class LobbyControl {
             }
         }
         
+    }
+    
+    public void newRequest(String user)
+    {
+        RequestForm rf = new RequestForm(this);
+        requestList.add(rf);
+        rf.setUser(user);
+        rf.setVisible(true);
+    }
+    
+    public void confirmRequest(String user) {
+        for (Object o : requestList)
+        {
+            RequestForm rf = (RequestForm)o;
+            rf.close();
+        }
+        requestList.clear();
+        ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
+        try {
+            ct.send(serialize(sm), sk);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }
     @Override
     protected void finalize()
