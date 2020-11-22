@@ -6,12 +6,10 @@
 package Client.Controller;
 
 import Client.Model.ClientDataEvent;
+import Client.Model.Matrix;
 import Client.View.LobbyForm;
 import Client.View.LoginForm;
-import Client.View.RequestForm;
-import Server.Model.Message.ClientMessage;
 import Server.Model.Message.ServerMessage;
-import Server.Model.UserAccount;
 import Server.Model.UserTable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -105,6 +103,12 @@ public class ResponseHandler implements Runnable
                             {
                                 lc.newRequest((String)(sm.getData()));
                             }
+                            else if (sm.getStatus() == ServerMessage.STATUS.S_OK)
+                            {
+                                //Create match
+                                Matrix matrix = (Matrix)(sm.getData());
+                                lc.createMatch(matrix);
+                            }
                             break;
                         default:
                             break;
@@ -115,7 +119,6 @@ public class ResponseHandler implements Runnable
             } catch (ClassNotFoundException ex) {
                 System.out.println(ex);
             }
-            
         }
     }
     

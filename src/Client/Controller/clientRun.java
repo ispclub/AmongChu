@@ -5,7 +5,10 @@
  */
 package Client.Controller;
 
+import Client.Model.Matrix;
 import Server.Model.UserTable;
+import static Utils.Utils.WINDOW_HEIGHT;
+import static Utils.Utils.WINDOW_WIDTH;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
@@ -57,5 +60,12 @@ public class clientRun {
         lyc = new LobbyControl(username, ct, this, ut, socketChannelMain, rsp);
         rsp.setLc(lyc);
         socketChannelTable = ct.initConnection(null, 12347);
+    }
+    public void toGame(Matrix matrix)
+    {
+        PikachuController pika = new PikachuController(matrix, ct);
+        pika.setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
+        pika.setLocationRelativeTo(null);
+        pika.start();
     }
 }

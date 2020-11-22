@@ -5,6 +5,7 @@
  */
 package Client.Controller;
 
+import Client.Model.Matrix;
 import Client.View.LobbyForm;
 import Client.View.RequestForm;
 import Server.Model.Message.ClientMessage;
@@ -105,6 +106,17 @@ public class LobbyControl {
         } catch (IOException ex) {
             System.out.println(ex);
         }
+    }
+    public void createMatch(Matrix matrix)
+    {
+        for (Object o : requestList)
+        {
+            RequestForm rf = (RequestForm)o;
+            rf.close();
+        }
+        requestList.clear();
+        lf.setVisible(false);
+        main.toGame(matrix);
     }
     @Override
     protected void finalize()

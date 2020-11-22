@@ -5,11 +5,13 @@
  */
 package Server.Controller;
 
+import Client.Model.Matrix;
 import Server.Model.Message.ClientMessage;
 import Server.Model.Message.ServerMessage;
 import Server.Model.ServerDataEvent;
 import Server.Model.UserAccount;
 import Server.Model.UserTable;
+import Utils.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +20,6 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,6 +39,7 @@ public class ServerQueueRequest implements Runnable {
     private final BidiMap clientName = new DualHashBidiMap();
     private DatabaseManager dbm;
     private Map Match = new HashMap();
+    private final BidiMap runningGame = new DualHashBidiMap();
 
     private Object byteBufferToObject(ByteBuffer b) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream;
@@ -186,6 +188,14 @@ public class ServerQueueRequest implements Runnable {
                                     if (needCreateMatch(currentUser, userToChallenge))
                                     {
                                         //Create a match here
+                                        runningGame.put(currentUser, userToChallenge);
+                                        Matrix matrix = new Matrix(Utils.MAP_ROW, Utils.MAP_COL);
+                                        SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
+                                        sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, matrix, ServerMessage.REQUEST.CHALLENGE);
+                                        byte[] match = serialize(sm);
+                                        // gửi cho cả 2
+                                        dataEvent.getServerReactor().send(sc, match);
+                                        dataEvent.getServerReactor().send(dataEvent.getSocket(), match);
                                         System.out.println("Tạo trận đấu");
                                     }else{
                                         SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));

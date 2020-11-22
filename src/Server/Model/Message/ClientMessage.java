@@ -15,7 +15,8 @@ public class ClientMessage implements Serializable{
     public enum REQUEST
     {
         LOGIN,
-        CHALLENGE;
+        CHALLENGE,
+        WIN;
     }
     private REQUEST request;
     private Object data;
