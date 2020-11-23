@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -51,6 +52,19 @@ public class LobbyControl {
         return out.toByteArray();
     }
 
+    void show(String user) {
+        int choice = JOptionPane.showConfirmDialog(lf, "Bạn có muốn đấu lại?", "AmongChu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (choice == JOptionPane.YES_OPTION)
+        {
+            ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
+            try {
+                ct.send(serialize(sm), sk);
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+        }
+        lf.setVisible(true);
+    }
     
     private class LogoutListener implements ActionListener
     {

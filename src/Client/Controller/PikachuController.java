@@ -16,6 +16,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.channels.SocketChannel;
 import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -31,10 +35,12 @@ public class PikachuController extends JFrame{
     private Matrix matrix;
     private int coupleDone;
     private ConnectThread ct;
-    public PikachuController(Matrix maxtrix, ConnectThread ct) throws HeadlessException
+    private SocketChannel sc;
+    public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc) throws HeadlessException
     {
         super("Quẩy lên bạn ơi");
         this.ct = ct;
+        this.sc = sc;
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
         this.matrix = maxtrix;
         setIconImage(icon);
@@ -54,7 +60,7 @@ public class PikachuController extends JFrame{
         this.dispose();
     }
     public void start() {
-        playGameView.renderMap(matrix.renderMatrix());
+        playGameView.renderMap(matrix.getMatrix());
 
         int i = (new Random()).nextInt(5);
         playGameView.setBackgroundImage("../../Resource/bg_" + i + ".png");
@@ -88,12 +94,18 @@ public class PikachuController extends JFrame{
 
                         if (!matrix.canPlay() && coupleDone < (matrix.getRow() - 2) * (matrix.getCol() - 2) / 2) {
                             JOptionPane.showMessageDialog(null, "Không thể chơi tiếp!");
+                            //need reset map here
                         }
 
                         if (coupleDone == (matrix.getRow() - 2) * (matrix.getCol() - 2) / 2) {
                             // TODO : chuc mung chien thang!
+                            //JOptionPane.showMessageDialog(null, "Win!");
                             ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.WIN, null);
-                            ct.send(data, socketChannel);
+                            try {
+                                ct.send(serialize(cm), sc);
+                            } catch (IOException ex) {
+                                System.out.println("Serialize thất bại");
+                            }
                         }
                     } else {
                         pikachus[0].removeBorder();
@@ -106,5 +118,12 @@ public class PikachuController extends JFrame{
 
         this.add(playGameView, BorderLayout.CENTER);
         setVisible(true);
+    }
+    private static byte[] serialize(Object obj) throws IOException 
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
     }
 }

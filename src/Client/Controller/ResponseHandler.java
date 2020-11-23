@@ -110,6 +110,17 @@ public class ResponseHandler implements Runnable
                                 lc.createMatch(matrix);
                             }
                             break;
+                        case RESULT:
+                            if (sm.getStatus() == ServerMessage.STATUS.S_OK)
+                            {
+                                JOptionPane.showMessageDialog(null, "Bạn đã chiến thắng " + sm.getData());
+                                main.backToLobby((String) sm.getData());
+                            }
+                            else if (sm.getStatus() == ServerMessage.STATUS.S_FAIL)
+                            {
+                                JOptionPane.showMessageDialog(null, "Bạn đã thua " + sm.getData());
+                                main.backToLobby((String) sm.getData());
+                            }
                         default:
                             break;
                     }

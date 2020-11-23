@@ -22,6 +22,7 @@ public class clientRun {
     private LoginControl lc = null;
     private SocketChannel socketChannelMain = null;
     private SocketChannel socketChannelTable = null;
+    private PikachuController pika = null;
 
     public void setSocketChannelMain(SocketChannel socketChannelMain) {
         this.socketChannelMain = socketChannelMain;
@@ -63,9 +64,18 @@ public class clientRun {
     }
     public void toGame(Matrix matrix)
     {
-        PikachuController pika = new PikachuController(matrix, ct);
+        pika = new PikachuController(matrix, ct, socketChannelMain);
         pika.setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         pika.setLocationRelativeTo(null);
         pika.start();
+    }
+    public void backToLobby(String user)
+    {
+        if (pika != null)
+        {
+            pika.close();
+            pika = null;
+        }
+        lyc.show(user);
     }
 }

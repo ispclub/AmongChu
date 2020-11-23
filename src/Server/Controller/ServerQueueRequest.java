@@ -39,7 +39,7 @@ public class ServerQueueRequest implements Runnable {
     private final BidiMap clientName = new DualHashBidiMap();
     private DatabaseManager dbm;
     private Map Match = new HashMap();
-    private final BidiMap runningGame = new DualHashBidiMap();
+    private final Map runningGame = new HashMap();
 
     private Object byteBufferToObject(ByteBuffer b) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream;
@@ -80,29 +80,26 @@ public class ServerQueueRequest implements Runnable {
     public ServerQueueRequest() throws SQLException {
         dbm = new DatabaseManager();
     }
-    private void addToRequestMap(String a, String b)
-    {
-        Set set = (Set)Match.get(a);
-        if (set == null)
-        {
+
+    private void addToRequestMap(String a, String b) {
+        Set set = (Set) Match.get(a);
+        if (set == null) {
             set = new HashSet();
-            this.Match.put(a, set);   
+            this.Match.put(a, set);
         }
         set.add(b);
     }
-    private void removeFromRequestMap(String user)
-    {
+
+    private void removeFromRequestMap(String user) {
         this.Match.remove(user);
     }
-    private boolean needCreateMatch(String currentUser, String otherUser)
-    {
-        Set array = (Set)this.Match.get(otherUser);
-        if (array == null)
-        {
+
+    private boolean needCreateMatch(String currentUser, String otherUser) {
+        Set array = (Set) this.Match.get(otherUser);
+        if (array == null) {
             return false;
         }
-        if (array.contains(currentUser))
-        {
+        if (array.contains(currentUser)) {
             //remove all request
             this.Match.remove(currentUser);
             this.Match.remove(otherUser);
@@ -110,6 +107,7 @@ public class ServerQueueRequest implements Runnable {
         }
         return false;
     }
+
     @Override
     public void run() {
         ServerDataEvent dataEvent;
@@ -148,78 +146,119 @@ public class ServerQueueRequest implements Runnable {
             }
             if (o instanceof ClientMessage) {
                 ClientMessage cm = (ClientMessage) o;
-                if (cm.getRequest() == ClientMessage.REQUEST.LOGIN) {
-                    UserAccount ua = (UserAccount) cm.getData();
-                    int temp = -1;
-                    try {
-                        if ((temp = dbm.checkLogin(ua)) == 0) {
-                            System.out.println("Client đăng nhập thành công");
-                            dbm.setLogin(ua);
-                            clientName.put(dataEvent.getSocket(), ua.getUsername());
-                            UserTable ut = dbm.getUserTable();
-                            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, ut, ServerMessage.REQUEST.LOGIN);
-                            dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
-                        } else if (temp == 1) {
-                            System.out.println("Client đăng nhập thất bại");
-                            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
-                            dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
-                        } else if (temp == 2) {
-                            System.out.println("Client đã được đăng nhập tại vị trí khác");
-                            ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
-                            dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
-                        }
-                    } catch (SQLException ex) {
-                        System.out.println("Check đăng nhập thất bại");
-                    } catch (IOException ex) {
-                        System.out.println("Serialize thất bại");
-                    }
-                } else if (cm.getRequest() == ClientMessage.REQUEST.CHALLENGE) {
-                    String userToChallenge = (String) (cm.getData());
-                    String currentUser = (String) (clientName.get(dataEvent.getSocket()));
-                    ServerMessage sm = null;
-                    try {
-                        if (userToChallenge.equals(currentUser)) {
-                            sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Bạn không thể thách đấu chính bản thân", ServerMessage.REQUEST.CHALLENGE);
-                            dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
-                        } else {
-                            if (dbm.checkIsLogin(userToChallenge) == true) {
-                                if (dbm.checkIsPlaying(userToChallenge) == false) {
-                                    // check if the userToChallenge is the one who request first
-                                    if (needCreateMatch(currentUser, userToChallenge))
-                                    {
-                                        //Create a match here
-                                        runningGame.put(currentUser, userToChallenge);
-                                        Matrix matrix = new Matrix(Utils.MAP_ROW, Utils.MAP_COL);
-                                        SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
-                                        sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, matrix, ServerMessage.REQUEST.CHALLENGE);
-                                        byte[] match = serialize(sm);
-                                        // gửi cho cả 2
-                                        dataEvent.getServerReactor().send(sc, match);
-                                        dataEvent.getServerReactor().send(dataEvent.getSocket(), match);
-                                        System.out.println("Tạo trận đấu");
-                                    }else{
-                                        SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
-                                        sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, currentUser, ServerMessage.REQUEST.CHALLENGE);
-                                        dataEvent.getServerReactor().send(sc, serialize(sm));
-                                        addToRequestMap(currentUser, userToChallenge);
-                                    }
-                                    
-                                } else {
-                                    sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Người chơi đã trong trận đấu khác", ServerMessage.REQUEST.CHALLENGE);
+                if (null != cm.getRequest()) {
+                    switch (cm.getRequest()) {
+                        case LOGIN:
+                            UserAccount ua = (UserAccount) cm.getData();
+                            int temp = -1;
+                            try {
+                                if ((temp = dbm.checkLogin(ua)) == 0) {
+                                    System.out.println("Client đăng nhập thành công");
+                                    dbm.setLogin(ua);
+                                    clientName.put(dataEvent.getSocket(), ua.getUsername());
+                                    UserTable ut = dbm.getUserTable();
+                                    ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, ut, ServerMessage.REQUEST.LOGIN);
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                                } else if (temp == 1) {
+                                    System.out.println("Client đăng nhập thất bại");
+                                    ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                                } else if (temp == 2) {
+                                    System.out.println("Client đã được đăng nhập tại vị trí khác");
+                                    ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.LOGIN);
                                     dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
                                 }
-                            } else {
-                                sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Người chơi hiện không Online", ServerMessage.REQUEST.CHALLENGE);
-                                dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                            } catch (SQLException ex) {
+                                System.out.println("Check đăng nhập thất bại");
+                            } catch (IOException ex) {
+                                System.out.println("Serialize thất bại");
                             }
+                            break;
+                        case CHALLENGE:
+                            String userToChallenge = (String) (cm.getData());
+                            String currentUser = (String) (clientName.get(dataEvent.getSocket()));
+                            ServerMessage sm = null;
+                            try {
+                                if (userToChallenge.equals(currentUser)) {
+                                    sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Bạn không thể thách đấu chính bản thân", ServerMessage.REQUEST.CHALLENGE);
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                                } else {
+                                    if (dbm.checkIsLogin(userToChallenge) == true) {
+                                        if (dbm.checkIsPlaying(userToChallenge) == false) {
+                                            // check if the userToChallenge is the one who request first
+                                            if (needCreateMatch(currentUser, userToChallenge)) {
+                                                //Create a match here
+                                                runningGame.put(currentUser, userToChallenge);
+                                                runningGame.put(userToChallenge, currentUser);
+                                                Matrix matrix = new Matrix(Utils.MAP_ROW, Utils.MAP_COL);
+                                                matrix.renderMatrix();
+                                                SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
+                                                sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, matrix, ServerMessage.REQUEST.CHALLENGE);
+                                                byte[] match = serialize(sm);
+                                                dbm.setPlaying(currentUser, userToChallenge);
+                                                // gửi cho cả 2
+                                                dataEvent.getServerReactor().send(sc, match);
+                                                dataEvent.getServerReactor().send(dataEvent.getSocket(), match);
+                                                System.out.println("Tạo trận đấu");
+                                            } else {
+                                                SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
+                                                sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, currentUser, ServerMessage.REQUEST.CHALLENGE);
+                                                dataEvent.getServerReactor().send(sc, serialize(sm));
+                                                addToRequestMap(currentUser, userToChallenge);
+                                            }
+
+                                        } else {
+                                            sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Người chơi đã trong trận đấu khác", ServerMessage.REQUEST.CHALLENGE);
+                                            dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                                        }
+                                    } else {
+                                        sm = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.MESSAGE_BOX, "Người chơi hiện không Online", ServerMessage.REQUEST.CHALLENGE);
+                                        dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(sm));
+                                    }
+                                }
+                            } catch (SQLException ex) {
+                                System.out.println(ex);
+                            } catch (IOException ex) {
+                                System.out.println(ex);
+                            }
+                            break;
+                        case WIN:
+                            String winner = (String) (clientName.get(dataEvent.getSocket()));
+                            String loser = (String) (runningGame.get(winner));
+                    {
+                        try {
+                            dbm.addPoint(winner);
+                        } catch (SQLException ex) {
+                            System.out.println("Fail when add point");
                         }
-                    } catch (SQLException ex) {
-                        System.out.println(ex);
-                    } catch (IOException ex) {
-                        System.out.println(ex);
+                    }
+                            try {
+                                dbm.setOnline(loser, winner);
+                            } catch (SQLException ex) {
+                                System.out.println("SQLe when setOnline");
+                            }
+                            SocketChannel scLoser = (SocketChannel) (clientName.getKey(loser));
+                            ServerMessage smWinner = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, loser, ServerMessage.REQUEST.RESULT);
+                            try {
+                                dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(smWinner));
+                            } catch (IOException ex) {
+                                System.out.println("Fail send winner");
+                            }
+                            ServerMessage smLoser = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.NONE, winner, ServerMessage.REQUEST.RESULT);
+                            try {
+                                dataEvent.getServerReactor().send(scLoser, serialize(smLoser));
+                            } catch (IOException ex) {
+                                System.out.println("Fail send loser");
+                            }
+                            runningGame.remove(winner);
+                            runningGame.remove(loser);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
+            else System.out.println("Đéo hiểu gửi gì");
         }
     }
 }

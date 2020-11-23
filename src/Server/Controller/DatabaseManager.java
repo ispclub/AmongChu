@@ -107,4 +107,22 @@ public class DatabaseManager{
         ResultSet rs = stmt.executeQuery(query);
         return rs.next();
     }
+    public void setPlaying(String a, String b) throws SQLException
+    {
+        String query = "UPDATE User_Account set isPlaying = TRUE where (username = '" + a + "' or username = '" + b + "');";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+    }
+    public void setOnline(String a, String b) throws SQLException
+    {
+        String query = "UPDATE User_Account set isPlaying = FALSE where (username = '" + a + "' or username = '" + b + "');";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+    }
+    public void addPoint(String user) throws SQLException
+    {
+        String query = "UPDATE User_Account set point = point + 1 where username = '" + user +"'";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+    }
 }

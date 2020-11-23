@@ -27,7 +27,8 @@ public class ServerMessage implements Serializable{
     {
         LOGIN,
         CHALLENGE,
-        TABLEDATA;
+        TABLEDATA,
+        RESULT;
     }
     private STATUS status;
     private ACTION action;
