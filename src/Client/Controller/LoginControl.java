@@ -27,6 +27,7 @@ public class LoginControl {
     private SocketChannel sk;
     public LoginControl(ConnectThread ct, clientRun cr, ResponseHandler rh)
     {
+        
         this.cr = cr;
         this.ct = ct;
         lf = new LoginForm();

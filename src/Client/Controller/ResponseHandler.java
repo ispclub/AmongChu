@@ -111,16 +111,23 @@ public class ResponseHandler implements Runnable
                             }
                             break;
                         case RESULT:
-                            if (sm.getStatus() == ServerMessage.STATUS.S_OK)
-                            {
-                                JOptionPane.showMessageDialog(null, "Bạn đã chiến thắng " + sm.getData());
-                                main.backToLobby((String) sm.getData());
-                            }
-                            else if (sm.getStatus() == ServerMessage.STATUS.S_FAIL)
-                            {
-                                JOptionPane.showMessageDialog(null, "Bạn đã thua " + sm.getData());
-                                main.backToLobby((String) sm.getData());
-                            }
+                            if (null != sm.getStatus())
+                            switch (sm.getStatus()) {
+                        case S_OK:
+                            //JOptionPane.showMessageDialog(null, "Bạn đã chiến thắng " + sm.getData());
+                            main.backToLobby((String) sm.getData(), true);
+                            break;
+                        case S_FAIL:
+                            //JOptionPane.showMessageDialog(null, "Bạn đã thua " + sm.getData());
+                            main.backToLobby((String) sm.getData(), false);
+                            break;
+                        case S_WARN:
+                            JOptionPane.showMessageDialog(null, "Người chơi " + sm.getData() + " đã thoát");
+                            main.forceBackToLobby();
+                            break;
+                        default:
+                            break;
+                    }
                         default:
                             break;
                     }

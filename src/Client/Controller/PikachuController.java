@@ -42,8 +42,8 @@ public class PikachuController extends JFrame{
         this.ct = ct;
         this.sc = sc;
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
-        this.matrix = maxtrix;
         setIconImage(icon);
+        this.matrix = maxtrix;
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }

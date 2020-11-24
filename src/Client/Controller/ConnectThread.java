@@ -21,8 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -123,9 +122,9 @@ public class ConnectThread extends Thread{
                     }
                 }
             } catch (ClosedChannelException ex) {
-                Logger.getLogger(ConnectThread.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "Không thể kết nối tới server");
             } catch (IOException ex) {
-                Logger.getLogger(ConnectThread.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, "IO Exception");
             }
         }
     }

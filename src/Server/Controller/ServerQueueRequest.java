@@ -131,6 +131,26 @@ public class ServerQueueRequest implements Runnable {
                 } catch (SQLException ex) {
                     System.out.println("Set Logout thất bại");
                 }
+                if (runningGame.get(user) != null)
+                {
+                    String winner = (String) runningGame.get(user);
+                    String loser = new String(user);
+                    SocketChannel winnerSocket = (SocketChannel) clientName.getKey(winner);
+                    ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, loser, ServerMessage.REQUEST.RESULT);
+                    try {
+                        dataEvent.getServerReactor().send(winnerSocket, serialize(sm));
+                    } catch (IOException ex) {
+                        System.out.println("Gửi response force close thất bại");
+                    }
+                    try {
+                        dbm.addPoint(winner);
+                        dbm.setOnline(winner);
+                    } catch (SQLException ex) {
+                        System.out.println("Except khi add point khi force close");
+                    }
+                    runningGame.remove(winner);
+                    runningGame.remove(user);
+                }
                 removeFromRequestMap(user);
                 clientName.removeValue(dataEvent.getSocket());
                 System.out.println("Client đăng xuất thành công");

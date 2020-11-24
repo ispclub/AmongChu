@@ -119,6 +119,12 @@ public class DatabaseManager{
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
+    public void setOnline(String a) throws SQLException
+    {
+        String query = "UPDATE User_Account set isPlaying = FALSE where username = '" + a + "';";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+    }
     public void addPoint(String user) throws SQLException
     {
         String query = "UPDATE User_Account set point = point + 1 where username = '" + user +"'";

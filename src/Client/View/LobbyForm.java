@@ -8,9 +8,11 @@ package Client.View;
 import Server.Model.UserTable;
 import Server.Model.UserTableData;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -31,6 +33,8 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
     private String name;
     public LobbyForm() {
         initComponents();
+        Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
+        setIconImage(icon);
         this.getContentPane().setBackground(Color.BLACK);
         btnLogout.addActionListener(this);
         tablemodel = tblUser.getModel();

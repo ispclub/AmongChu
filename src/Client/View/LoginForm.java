@@ -7,8 +7,10 @@ package Client.View;
 
 import Server.Model.UserAccount;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,6 +24,8 @@ public class LoginForm extends javax.swing.JFrame implements ActionListener{
      */
     public LoginForm() {
         initComponents();
+        Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
+        setIconImage(icon);
         this.getContentPane().setBackground(Color.BLACK);
         txtID.requestFocusInWindow();
         btnLogin.addActionListener(this);

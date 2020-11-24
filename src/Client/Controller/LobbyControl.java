@@ -32,6 +32,7 @@ public class LobbyControl {
     private ResponseHandler rh;
     private ArrayList requestList = new ArrayList();
     public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk, ResponseHandler rh) {
+        
         this.username = username;
         this.sk = sk;
         this.ct = ct;
@@ -52,8 +53,13 @@ public class LobbyControl {
         return out.toByteArray();
     }
 
-    void show(String user) {
-        int choice = JOptionPane.showConfirmDialog(lf, "Bạn có muốn đấu lại?", "AmongChu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    public void show(String user, boolean status) {
+        String msg;
+        if (status)
+        {
+            msg = "Bạn đã chiến thắng " + user + ", bạn có muốn đấu lại?";
+        }else msg = "Bạn đã thua " + user + ", bạn có muốn đấu lại?";
+        int choice = JOptionPane.showConfirmDialog(lf, msg, "AmongChu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION)
         {
             ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
@@ -65,7 +71,10 @@ public class LobbyControl {
         }
         lf.setVisible(true);
     }
-    
+    public void forceShow()
+    {
+        lf.setVisible(true);
+    }
     private class LogoutListener implements ActionListener
     {
         @Override

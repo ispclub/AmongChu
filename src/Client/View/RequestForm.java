@@ -7,6 +7,8 @@ package Client.View;
 
 import Client.Controller.LobbyControl;
 import java.awt.Color;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -21,6 +23,8 @@ public class RequestForm extends javax.swing.JFrame{
     private LobbyControl lc;
     public RequestForm(LobbyControl lc) {
         initComponents();
+        Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
+        setIconImage(icon);
         this.lc = lc;
         this.getContentPane().setBackground(Color.BLACK);
     }

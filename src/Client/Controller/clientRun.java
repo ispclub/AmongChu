@@ -69,13 +69,22 @@ public class clientRun {
         pika.setLocationRelativeTo(null);
         pika.start();
     }
-    public void backToLobby(String user)
+    public void backToLobby(String user, boolean status)
     {
         if (pika != null)
         {
             pika.close();
             pika = null;
         }
-        lyc.show(user);
+        lyc.show(user, status);
+    }
+
+    void forceBackToLobby() {
+        if (pika != null)
+        {
+            pika.close();
+            pika = null;
+        }
+        lyc.forceShow();
     }
 }
