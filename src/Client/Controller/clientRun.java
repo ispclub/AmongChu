@@ -27,6 +27,10 @@ public class clientRun {
     public void setSocketChannelMain(SocketChannel socketChannelMain) {
         this.socketChannelMain = socketChannelMain;
     }
+    public boolean checkSocketChannelMain()
+    {
+        return socketChannelMain != null;
+    }
     private LobbyControl lyc = null;
     public static void main(String[] args) throws IOException {
         new clientRun();

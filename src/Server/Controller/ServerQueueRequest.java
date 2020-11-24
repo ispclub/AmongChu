@@ -26,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
@@ -125,14 +127,15 @@ public class ServerQueueRequest implements Runnable {
             // Handler message here
             if (dataEvent.getData() == null) {
                 // remove the client
+                if (clientName.get(dataEvent.getSocket()) == null)
+                    continue;
                 String user = (String) (clientName.get(dataEvent.getSocket()));
                 try {
                     dbm.setLogout(user);
                 } catch (SQLException ex) {
                     System.out.println("Set Logout thất bại");
                 }
-                if (runningGame.get(user) != null)
-                {
+                if (runningGame.get(user) != null) {
                     String winner = (String) runningGame.get(user);
                     String loser = new String(user);
                     SocketChannel winnerSocket = (SocketChannel) clientName.getKey(winner);
@@ -169,6 +172,8 @@ public class ServerQueueRequest implements Runnable {
                 if (null != cm.getRequest()) {
                     switch (cm.getRequest()) {
                         case LOGIN:
+                            if (!(cm.getData() instanceof UserAccount))
+                                continue;
                             UserAccount ua = (UserAccount) cm.getData();
                             int temp = -1;
                             try {
@@ -195,6 +200,8 @@ public class ServerQueueRequest implements Runnable {
                             }
                             break;
                         case CHALLENGE:
+                            if (!(cm.getData() instanceof String))
+                                continue;
                             String userToChallenge = (String) (cm.getData());
                             String currentUser = (String) (clientName.get(dataEvent.getSocket()));
                             ServerMessage sm = null;
@@ -245,13 +252,11 @@ public class ServerQueueRequest implements Runnable {
                         case WIN:
                             String winner = (String) (clientName.get(dataEvent.getSocket()));
                             String loser = (String) (runningGame.get(winner));
-                    {
-                        try {
-                            dbm.addPoint(winner);
-                        } catch (SQLException ex) {
-                            System.out.println("Fail when add point");
-                        }
-                    }
+                            try {
+                                dbm.addPoint(winner);
+                            } catch (SQLException ex) {
+                                System.out.println("Fail when add point");
+                            }
                             try {
                                 dbm.setOnline(loser, winner);
                             } catch (SQLException ex) {
@@ -273,12 +278,31 @@ public class ServerQueueRequest implements Runnable {
                             runningGame.remove(winner);
                             runningGame.remove(loser);
                             break;
+                        case REGISTER:
+                            if (!(cm.getData() instanceof UserAccount))
+                                continue;
+                            UserAccount regAccount = (UserAccount) cm.getData();
+                            try {
+                                if (dbm.Register(regAccount)) {
+                                    ServerMessage regSM = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.REGISTER);
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(regSM));
+                                } else {
+                                    ServerMessage regSM = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.NONE, null, ServerMessage.REQUEST.REGISTER);
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(regSM));
+                                }
+                            } catch (SQLException ex) {
+                                System.out.println("Gửi thông tin create new account thất bại 1");
+                            } catch (IOException ex) {
+                                System.out.println("Gửi thông tin create new account thất bại 2");
+                            }
+                            break;
                         default:
                             break;
                     }
                 }
+            } else {
+                System.out.println("Đéo hiểu gửi gì");
             }
-            else System.out.println("Đéo hiểu gửi gì");
         }
     }
 }

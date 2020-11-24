@@ -26,6 +26,7 @@ public class ServerMessage implements Serializable{
     public enum REQUEST
     {
         LOGIN,
+        REGISTER,
         CHALLENGE,
         TABLEDATA,
         RESULT;

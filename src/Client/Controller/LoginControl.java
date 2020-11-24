@@ -33,6 +33,7 @@ public class LoginControl {
         lf = new LoginForm();
         lf.setVisible(true);
         lf.addLoginListener(new LoginListener());
+        lf.addRegisterListener(new RegisterListener());
         rh.setFrameToShow(lf);
         if (!ct.isAlive())
             ct.start();
@@ -46,17 +47,51 @@ public class LoginControl {
     }
     private class LoginListener implements ActionListener
     {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             try
             {
-                if ((sk = ct.initConnection(null, 12346)) == null){
-                    JOptionPane.showMessageDialog(lf, "Không thể kết nối tới server");
+                if (!cr.checkSocketChannelMain())
+                {
+                    if ((sk = ct.initConnection(null, 12346)) == null){
+                        JOptionPane.showMessageDialog(lf, "Không thể kết nối tới server");
+                    }
+                    cr.setSocketChannelMain(sk);
                 }
                 UserAccount x = lf.getUser();
-                cr.setSocketChannelMain(sk);
+                if (x.getUsername().isEmpty() || x.getPassword().isEmpty())
+                {
+                    JOptionPane.showMessageDialog(lf, "Tài khoản hoặc mật khẩu không được để trống");
+                    return ;
+                }
                 ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGIN, x);
+                ct.send(serialize(cm), sk);
+            }catch (Exception ex)
+            {
+                System.out.println(ex);
+            }
+        }
+    }
+    private class RegisterListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try
+            {
+                if (!cr.checkSocketChannelMain())
+                {
+                    if ((sk = ct.initConnection(null, 12346)) == null){
+                        JOptionPane.showMessageDialog(lf, "Không thể kết nối tới server");
+                    }
+                    cr.setSocketChannelMain(sk);
+                }
+                UserAccount x = lf.getUser();
+                if (x.getUsername().isEmpty() || x.getPassword().isEmpty())
+                {
+                    JOptionPane.showMessageDialog(lf, "Tài khoản hoặc mật khẩu không được để trống");
+                    return ;
+                }
+                ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.REGISTER, x);
                 ct.send(serialize(cm), sk);
             }catch (Exception ex)
             {

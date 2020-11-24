@@ -16,7 +16,8 @@ public class ClientMessage implements Serializable{
     {
         LOGIN,
         CHALLENGE,
-        WIN;
+        WIN,
+        REGISTER;
     }
     private REQUEST request;
     private Object data;

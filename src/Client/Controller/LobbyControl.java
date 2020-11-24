@@ -98,6 +98,11 @@ public class LobbyControl {
         @Override
         public void actionPerformed(ActionEvent e) {
             String user = lf.getUserNameSelectedRow();
+            if (user == null)
+            {
+                JOptionPane.showMessageDialog(lf, "Vui lòng chọn đối thủ");
+                return;
+            }
             ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
             try {
                 ct.send(serialize(sm), sk);

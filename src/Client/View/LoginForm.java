@@ -24,6 +24,8 @@ public class LoginForm extends javax.swing.JFrame implements ActionListener{
      */
     public LoginForm() {
         initComponents();
+        this.pack();
+        this.setLocationRelativeTo(null);
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
         setIconImage(icon);
         this.getContentPane().setBackground(Color.BLACK);
@@ -185,6 +187,10 @@ public class LoginForm extends javax.swing.JFrame implements ActionListener{
     public void addLoginListener(ActionListener log)
     {
         btnLogin.addActionListener(log);
+    }
+    public void addRegisterListener(ActionListener log)
+    {
+        btnRegister.addActionListener(log);
     }
     public UserAccount getUser()
     {

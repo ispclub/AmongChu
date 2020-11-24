@@ -131,4 +131,16 @@ public class DatabaseManager{
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
+    public boolean Register(UserAccount ua) throws SQLException
+    {
+        //check xem co ton tai user hay khong
+        String query = "select username from User_Account where username = '" + ua.getUsername() +"';";
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        if (rs.next()) 
+            return false;
+        query = "insert into User_Account(username,password) values ('" + ua.getUsername() + "','" + ua.getPassword() + "');";
+        stmt.executeUpdate(query);
+        return true;
+    }
 }

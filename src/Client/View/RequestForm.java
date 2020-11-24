@@ -23,6 +23,8 @@ public class RequestForm extends javax.swing.JFrame{
     private LobbyControl lc;
     public RequestForm(LobbyControl lc) {
         initComponents();
+        this.pack();
+        this.setLocationRelativeTo(null);
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
         setIconImage(icon);
         this.lc = lc;

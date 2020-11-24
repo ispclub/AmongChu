@@ -33,6 +33,8 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
     private String name;
     public LobbyForm() {
         initComponents();
+        this.pack();
+        this.setLocationRelativeTo(null);
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
         setIconImage(icon);
         this.getContentPane().setBackground(Color.BLACK);
