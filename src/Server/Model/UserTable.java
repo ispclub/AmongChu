@@ -18,18 +18,21 @@ import java.util.Comparator;
  *
  * @author hoang
  */
-public class UserTable implements Serializable{
+public class UserTable implements Serializable {
+
     private ArrayList<UserTableData> listUTD;
-    public void Sort()
-    {
+
+    public void Sort() {
         Collections.sort(listUTD, new Comparator<UserTableData>() {
             @Override
             public int compare(UserTableData o1, UserTableData o2) {
-                if (o1.getStatus() != o2.getStatus())
-                return o1.getStatus().compareTo(o2.getStatus());
-            if (o1.getPoint() != o2.getPoint())
-                return (o1.getPoint() > o2.getPoint() ? -1 : 1);
-            return o1.getUsername().compareTo(o2.getUsername());
+                if (o1.getStatus() != o2.getStatus()) {
+                    return o1.getStatus().compareTo(o2.getStatus());
+                }
+                if (o1.getPoint() != o2.getPoint()) {
+                    return (o1.getPoint() > o2.getPoint() ? -1 : 1);
+                }
+                return o1.getUsername().compareTo(o2.getUsername());
             }
         });
     }
@@ -50,12 +53,8 @@ public class UserTable implements Serializable{
         this.listUTD = listUTD;
         this.Sort();
     }
-    public void addElement(UserTableData utd)
-    {
+
+    public void addElement(UserTableData utd) {
         listUTD.add(utd);
     }
-    /*public boolean compareTo(UserTable ut)
-    {
-        
-    }*/
 }

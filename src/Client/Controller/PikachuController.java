@@ -30,14 +30,15 @@ import javax.swing.WindowConstants;
  *
  * @author hoang
  */
-public class PikachuController extends JFrame{
+public class PikachuController extends JFrame {
+
     private PlayGameView playGameView;
     private Matrix matrix;
     private int coupleDone;
     private ConnectThread ct;
     private SocketChannel sc;
-    public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc) throws HeadlessException
-    {
+
+    public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc) throws HeadlessException {
         super("Quẩy lên bạn ơi");
         this.ct = ct;
         this.sc = sc;
@@ -47,18 +48,19 @@ public class PikachuController extends JFrame{
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
+
     @Override
     protected void frameInit() {
         super.frameInit();
         this.playGameView = new PlayGameView(MAP_ROW, MAP_COL);
         this.playGameView.setSize(Utils.WINDOW_WIDTH, Utils.WINDOW_HEIGHT);
-        
+
     }
 
-    public void close()
-    {
+    public void close() {
         this.dispose();
     }
+
     public void start() {
         playGameView.renderMap(matrix.getMatrix());
 
@@ -119,8 +121,8 @@ public class PikachuController extends JFrame{
         this.add(playGameView, BorderLayout.CENTER);
         setVisible(true);
     }
-    private static byte[] serialize(Object obj) throws IOException 
-    {
+
+    private static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);

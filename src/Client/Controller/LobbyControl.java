@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
  * @author hoang
  */
 public class LobbyControl {
+
     private String username;
     private ConnectThread ct;
     private clientRun main;
@@ -31,8 +32,9 @@ public class LobbyControl {
     private SocketChannel sk = null;
     private ResponseHandler rh;
     private ArrayList requestList = new ArrayList();
+
     public LobbyControl(String username, ConnectThread ct, clientRun main, UserTable ut, SocketChannel sk, ResponseHandler rh) {
-        
+
         this.username = username;
         this.sk = sk;
         this.ct = ct;
@@ -45,8 +47,8 @@ public class LobbyControl {
         lf.addLogoutListener(new LogoutListener());
         lf.addChallengeListener(new ChallengeListener());
     }
-    private static byte[] serialize(Object obj) throws IOException 
-    {
+
+    private static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
@@ -55,13 +57,13 @@ public class LobbyControl {
 
     public void show(String user, boolean status) {
         String msg;
-        if (status)
-        {
+        if (status) {
             msg = "Bạn đã chiến thắng " + user + ", bạn có muốn đấu lại?";
-        }else msg = "Bạn đã thua " + user + ", bạn có muốn đấu lại?";
+        } else {
+            msg = "Bạn đã thua " + user + ", bạn có muốn đấu lại?";
+        }
         int choice = JOptionPane.showConfirmDialog(lf, msg, "AmongChu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if (choice == JOptionPane.YES_OPTION)
-        {
+        if (choice == JOptionPane.YES_OPTION) {
             ClientMessage sm = new ClientMessage(ClientMessage.REQUEST.CHALLENGE, user);
             try {
                 ct.send(serialize(sm), sk);
@@ -71,35 +73,33 @@ public class LobbyControl {
         }
         lf.setVisible(true);
     }
-    public void forceShow()
-    {
+
+    public void forceShow() {
         lf.setVisible(true);
     }
-    private class LogoutListener implements ActionListener
-    {
+
+    private class LogoutListener implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            try
-            {
+            try {
                 //ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.LOGOUT, null);
                 //ct.send(serialize(cm), sk);
                 ct.closeConnect(sk);
                 Thread.sleep(100);
                 main.toLogin();
-            }catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 System.out.println(ex);
             }
         }
     }
-    
-    private class ChallengeListener implements ActionListener
-    {
+
+    private class ChallengeListener implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent e) {
             String user = lf.getUserNameSelectedRow();
-            if (user == null)
-            {
+            if (user == null) {
                 JOptionPane.showMessageDialog(lf, "Vui lòng chọn đối thủ");
                 return;
             }
@@ -110,21 +110,19 @@ public class LobbyControl {
                 System.out.println(ex);
             }
         }
-        
+
     }
-    
-    public void newRequest(String user)
-    {
+
+    public void newRequest(String user) {
         RequestForm rf = new RequestForm(this);
         requestList.add(rf);
         rf.setUser(user);
         rf.setVisible(true);
     }
-    
+
     public void confirmRequest(String user) {
-        for (Object o : requestList)
-        {
-            RequestForm rf = (RequestForm)o;
+        for (Object o : requestList) {
+            RequestForm rf = (RequestForm) o;
             rf.close();
         }
         requestList.clear();
@@ -135,24 +133,23 @@ public class LobbyControl {
             System.out.println(ex);
         }
     }
-    public void createMatch(Matrix matrix)
-    {
-        for (Object o : requestList)
-        {
-            RequestForm rf = (RequestForm)o;
+
+    public void createMatch(Matrix matrix) {
+        for (Object o : requestList) {
+            RequestForm rf = (RequestForm) o;
             rf.close();
         }
         requestList.clear();
         lf.setVisible(false);
         main.toGame(matrix);
     }
+
     @Override
-    protected void finalize()
-    {
+    protected void finalize() {
         lf.dispose();
     }
-    public void close()
-    {
+
+    public void close() {
         this.finalize();
     }
 }

@@ -127,8 +127,9 @@ public class ServerQueueRequest implements Runnable {
             // Handler message here
             if (dataEvent.getData() == null) {
                 // remove the client
-                if (clientName.get(dataEvent.getSocket()) == null)
+                if (clientName.get(dataEvent.getSocket()) == null) {
                     continue;
+                }
                 String user = (String) (clientName.get(dataEvent.getSocket()));
                 try {
                     dbm.setLogout(user);
@@ -172,8 +173,9 @@ public class ServerQueueRequest implements Runnable {
                 if (null != cm.getRequest()) {
                     switch (cm.getRequest()) {
                         case LOGIN:
-                            if (!(cm.getData() instanceof UserAccount))
+                            if (!(cm.getData() instanceof UserAccount)) {
                                 continue;
+                            }
                             UserAccount ua = (UserAccount) cm.getData();
                             int temp = -1;
                             try {
@@ -200,8 +202,9 @@ public class ServerQueueRequest implements Runnable {
                             }
                             break;
                         case CHALLENGE:
-                            if (!(cm.getData() instanceof String))
+                            if (!(cm.getData() instanceof String)) {
                                 continue;
+                            }
                             String userToChallenge = (String) (cm.getData());
                             String currentUser = (String) (clientName.get(dataEvent.getSocket()));
                             ServerMessage sm = null;
@@ -279,8 +282,9 @@ public class ServerQueueRequest implements Runnable {
                             runningGame.remove(loser);
                             break;
                         case REGISTER:
-                            if (!(cm.getData() instanceof UserAccount))
+                            if (!(cm.getData() instanceof UserAccount)) {
                                 continue;
+                            }
                             UserAccount regAccount = (UserAccount) cm.getData();
                             try {
                                 if (dbm.Register(regAccount)) {

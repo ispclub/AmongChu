@@ -7,9 +7,11 @@ package Client.Controller;
 
 import Client.Model.Matrix;
 import Server.Model.UserTable;
+import Utils.Utils;
 import static Utils.Utils.WINDOW_HEIGHT;
 import static Utils.Utils.WINDOW_WIDTH;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -17,6 +19,7 @@ import java.nio.channels.SocketChannel;
  * @author hoang
  */
 public class clientRun {
+
     private ConnectThread ct = null;
     private ResponseHandler rsp = null;
     private LoginControl lc = null;
@@ -27,16 +30,17 @@ public class clientRun {
     public void setSocketChannelMain(SocketChannel socketChannelMain) {
         this.socketChannelMain = socketChannelMain;
     }
-    public boolean checkSocketChannelMain()
-    {
+
+    public boolean checkSocketChannelMain() {
         return socketChannelMain != null;
     }
     private LobbyControl lyc = null;
+
     public static void main(String[] args) throws IOException {
         new clientRun();
     }
-    private clientRun() throws IOException
-    {
+
+    private clientRun() throws IOException {
         rsp = new ResponseHandler();
         rsp.setMain(this);
         new Thread(rsp).start();
@@ -44,39 +48,36 @@ public class clientRun {
         //ct.initConnection(null, 12346);
         toLogin();
     }
-    public void toLogin() throws IOException
-    {
-        if (lyc != null)
-        {
+
+    public void toLogin() throws IOException {
+        if (lyc != null) {
             lyc.close();
             lyc = null;
         }
-        if (socketChannelTable != null)
-        {
+        if (socketChannelTable != null) {
             ct.closeConnect(socketChannelTable);
             socketChannelTable = null;
         }
         lc = new LoginControl(ct, this, rsp);
     }
-    public void toLobby(String username, UserTable ut) throws IOException
-    {
+
+    public void toLobby(String username, UserTable ut) throws IOException {
         lc.close();
         lc = null;
         lyc = new LobbyControl(username, ct, this, ut, socketChannelMain, rsp);
         rsp.setLc(lyc);
-        socketChannelTable = ct.initConnection(null, 12347);
+        socketChannelTable = ct.initConnection(InetAddress.getByName(Utils.host), Utils.port2);
     }
-    public void toGame(Matrix matrix)
-    {
+
+    public void toGame(Matrix matrix) {
         pika = new PikachuController(matrix, ct, socketChannelMain);
-        pika.setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
+        pika.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         pika.setLocationRelativeTo(null);
         pika.start();
     }
-    public void backToLobby(String user, boolean status)
-    {
-        if (pika != null)
-        {
+
+    public void backToLobby(String user, boolean status) {
+        if (pika != null) {
             pika.close();
             pika = null;
         }
@@ -84,8 +85,7 @@ public class clientRun {
     }
 
     void forceBackToLobby() {
-        if (pika != null)
-        {
+        if (pika != null) {
             pika.close();
             pika = null;
         }

@@ -14,11 +14,12 @@ import java.awt.Color;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
-public class Pikachu extends JButton{
+public class Pikachu extends JButton {
+
     private int xPoint;
     private int yPoint;
 
-    public Pikachu(int x, int y){
+    public Pikachu(int x, int y) {
         super();
         this.xPoint = x;
         this.yPoint = y;
@@ -32,11 +33,11 @@ public class Pikachu extends JButton{
         return yPoint;
     }
 
-    public void drawBorder(Color color){
+    public void drawBorder(Color color) {
         this.setBorder(new LineBorder(color, 2));
     }
 
-    public void removeBorder(){
+    public void removeBorder() {
         this.drawBorder(Color.white);
     }
 }

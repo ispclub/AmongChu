@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  *
  * @author hoang
  */
-public class LoginForm extends javax.swing.JFrame implements ActionListener{
+public class LoginForm extends javax.swing.JFrame implements ActionListener {
 
     /**
      * Creates new form LoginForm
@@ -184,23 +184,23 @@ public class LoginForm extends javax.swing.JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    public void addLoginListener(ActionListener log)
-    {
+
+    public void addLoginListener(ActionListener log) {
         btnLogin.addActionListener(log);
     }
-    public void addRegisterListener(ActionListener log)
-    {
+
+    public void addRegisterListener(ActionListener log) {
         btnRegister.addActionListener(log);
     }
-    public UserAccount getUser()
-    {
+
+    public UserAccount getUser() {
         UserAccount user = new UserAccount();
         user.setUsername(txtID.getText());
         user.setPassword(txtPassword.getText());
         return user;
     }
-    public void showMessage(String msg)
-    {
+
+    public void showMessage(String msg) {
         JOptionPane.showMessageDialog(this, msg);
     }
 }

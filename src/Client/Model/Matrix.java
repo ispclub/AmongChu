@@ -19,7 +19,8 @@ import java.util.Random;
  *
  * @author Ronaldo Hanh
  */
-public class Matrix implements Serializable{
+public class Matrix implements Serializable {
+
     private int matrix[][];
     private static final int CONST_VALUE = 0; //Mac dinh nhung o khong co anh co value  = 0
     private int row;
@@ -59,7 +60,6 @@ public class Matrix implements Serializable{
     }
 
     // them phuong thuc set value tai toa do cua pikachu
-
     public void setXY(Pikachu pikachu, int value) {
         this.matrix[pikachu.getXPoint()][pikachu.getYPoint()] = value;
     }
@@ -95,10 +95,10 @@ public class Matrix implements Serializable{
             }
         }
 
-        Utils.debug(getClass(),(row - 2) * (col - 2) / 4 - 1+"");
+        Utils.debug(getClass(), (row - 2) * (col - 2) / 4 - 1 + "");
 
         /*Dinh dang lai Matrix */
-        for (int i = 1; i <= PIKACHU_NUMBER+1; i++) {
+        for (int i = 1; i <= PIKACHU_NUMBER + 1; i++) {
             if (demPT(i) % 2 != 0) {
                 change(i);
             }
@@ -131,7 +131,7 @@ public class Matrix implements Serializable{
     }
 
     /*Giai thuat kiem tra 2 diem da click vao co duong noi voi nhau hay khong */
-    /*TH1: Cung nam tren 1 hang hoac 1 cot*/
+ /*TH1: Cung nam tren 1 hang hoac 1 cot*/
     private boolean checkLineX(int y1, int y2, int x) {
         int minCol = Math.min(y1, y2);
         int maxCol = Math.max(y1, y2);
@@ -153,6 +153,7 @@ public class Matrix implements Serializable{
         }
         return true;
     }
+
     /*TH2: Xet duyet cac duong di theo chieu ngang, doc trong pham vi chu 
      nhat */
 
@@ -189,10 +190,10 @@ public class Matrix implements Serializable{
         for (int x = pMinX.getXPoint(); x <= pMaxX.getXPoint(); x++) {
             System.out.println(x + "   " + pMinX.getXPoint() + "  " + pMinX.getYPoint());
             if (x > pMinX.getXPoint() && matrix[x][pMinX.getYPoint()] != CONST_VALUE) {
-                
-             //1System.out.println(x + "   "+ pMinX.getXPoint());
-             return false;
-             }
+
+                //1System.out.println(x + "   "+ pMinX.getXPoint());
+                return false;
+            }
             if ((matrix[x][pMaxX.getYPoint()] == CONST_VALUE || x == pMaxX.getXPoint())
                     && checkLineX(pMinX.getYPoint(), pMaxX.getYPoint(), x)
                     && checkLineY(x, pMaxX.getXPoint(), pMaxX.getYPoint())) {
@@ -264,6 +265,7 @@ public class Matrix implements Serializable{
         }
         return false;
     }
+
     /*Algorithm cho 2 diem*/
 
     public boolean algorithm(Pikachu p1, Pikachu p2) {
@@ -314,16 +316,16 @@ public class Matrix implements Serializable{
         return false; // tra ve false neu khong tim thay duong di 
     }
 
-    public boolean canPlay(){
-        for (int i = 1; i < row-1; i++){
-            for ( int j = 1; j < col-1;j++){
-                if (matrix[i][j]!=0){
-                    for (int m = 1 ; m < row -1; m++){
-                        for (int n = 1; n < col-1; n++){
-                            Utils.debug(getClass(),i+":"+j+" -> " + m + ":"+n);
-                            if ((m!=i || n!=j) && matrix[m][n]!=0 && matrix[m][n] == matrix[i][j]){
-                                if (algorithm(new Pikachu(m,n),new Pikachu(i,j))){
-                                    Utils.debug(getClass(),"Go: "+i+":"+j+" -> " + m + ":"+n);
+    public boolean canPlay() {
+        for (int i = 1; i < row - 1; i++) {
+            for (int j = 1; j < col - 1; j++) {
+                if (matrix[i][j] != 0) {
+                    for (int m = 1; m < row - 1; m++) {
+                        for (int n = 1; n < col - 1; n++) {
+                            Utils.debug(getClass(), i + ":" + j + " -> " + m + ":" + n);
+                            if ((m != i || n != j) && matrix[m][n] != 0 && matrix[m][n] == matrix[i][j]) {
+                                if (algorithm(new Pikachu(m, n), new Pikachu(i, j))) {
+                                    Utils.debug(getClass(), "Go: " + i + ":" + j + " -> " + m + ":" + n);
                                     return true;
                                 }
                             }

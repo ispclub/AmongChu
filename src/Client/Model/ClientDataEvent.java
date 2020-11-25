@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
  * @author hoang
  */
 public class ClientDataEvent {
+
     private ConnectThread connectThread;
     private SocketChannel socket;
     public byte[] data;
@@ -49,5 +50,4 @@ public class ClientDataEvent {
     public void setData(byte[] data) {
         this.data = data;
     }
-    
 }

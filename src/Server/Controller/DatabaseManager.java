@@ -18,19 +18,17 @@ import java.sql.Statement;
  *
  * @author hoang
  */
-public class DatabaseManager{
+public class DatabaseManager {
+
     private String dbUrl = "jdbc:mysql://localhost:3306/ltm";
     private String dbClass = "com.mysql.cj.jdbc.Driver";
     private Connection con;
-    public DatabaseManager() throws SQLException
-    {
-        try 
-        {
+
+    public DatabaseManager() throws SQLException {
+        try {
             Class.forName(dbClass);
-            con = DriverManager.getConnection (dbUrl, "root", "admin");
-        }
-        catch(ClassNotFoundException | SQLException e) 
-        {
+            con = DriverManager.getConnection(dbUrl, "root", "admin");
+        } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Database connect failed");
             System.exit(-1);
         }
@@ -39,51 +37,45 @@ public class DatabaseManager{
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    
-    public int checkLogin(UserAccount user) throws SQLException
-    {
-        String query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername()+ "' AND password = '" + user.getPassword() + "'";
+
+    public int checkLogin(UserAccount user) throws SQLException {
+        String query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername() + "' AND password = '" + user.getPassword() + "'";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
-        if (!rs.next())
-        {
+        if (!rs.next()) {
             return 1;           // Sai tai khoan hoac mat khau
         }
-        query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername()+ "' AND isOnline = FALSE";
+        query = "SELECT * FROM User_Account WHERE username = '" + user.getUsername() + "' AND isOnline = FALSE";
         rs = stmt.executeQuery(query);
-        if (rs.next())
-        {
+        if (rs.next()) {
             return 0;           // OK
         }
         return 2;               // Da login o noi khac
     }
-    
-    public void setLogout(String user) throws SQLException
-    {
-        if (user.isEmpty())
+
+    public void setLogout(String user) throws SQLException {
+        if (user.isEmpty()) {
             return;
+        }
         String query = "UPDATE User_Account set isOnline = FALSE where username = '" + user + "'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    
-    public void setLogin(UserAccount user) throws SQLException
-    {
-        String query = "UPDATE User_Account set isOnline = TRUE where username = '" + user.getUsername()+ "'";
+
+    public void setLogin(UserAccount user) throws SQLException {
+        String query = "UPDATE User_Account set isOnline = TRUE where username = '" + user.getUsername() + "'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
-        query = "UPDATE User_Account set isPlaying = FALSE where username = '" + user.getUsername()+ "'";
+        query = "UPDATE User_Account set isPlaying = FALSE where username = '" + user.getUsername() + "'";
         stmt.executeUpdate(query);
     }
-    
-    public UserTable getUserTable() throws SQLException
-    {
+
+    public UserTable getUserTable() throws SQLException {
         UserTable ut = new UserTable();
         String query = "select username, point, isPlaying from User_Account where isOnline = TRUE;";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
-        while (rs.next())
-        {
+        while (rs.next()) {
             UserTableData utd = new UserTableData();
             utd.setUsername(rs.getString(1));
             utd.setPoint(rs.getInt(2));
@@ -93,52 +85,53 @@ public class DatabaseManager{
         ut.Sort();
         return ut;
     }
-    public boolean checkIsLogin(String user) throws SQLException
-    {
+
+    public boolean checkIsLogin(String user) throws SQLException {
         String query = "select username from User_Account where isOnline = TRUE;";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         return rs.next();
     }
-    public boolean checkIsPlaying(String user) throws SQLException
-    {
+
+    public boolean checkIsPlaying(String user) throws SQLException {
         String query = "select username from User_Account where isPlaying = TRUE;";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         return rs.next();
     }
-    public void setPlaying(String a, String b) throws SQLException
-    {
+
+    public void setPlaying(String a, String b) throws SQLException {
         String query = "UPDATE User_Account set isPlaying = TRUE where (username = '" + a + "' or username = '" + b + "');";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    public void setOnline(String a, String b) throws SQLException
-    {
+
+    public void setOnline(String a, String b) throws SQLException {
         String query = "UPDATE User_Account set isPlaying = FALSE where (username = '" + a + "' or username = '" + b + "');";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    public void setOnline(String a) throws SQLException
-    {
+
+    public void setOnline(String a) throws SQLException {
         String query = "UPDATE User_Account set isPlaying = FALSE where username = '" + a + "';";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    public void addPoint(String user) throws SQLException
-    {
-        String query = "UPDATE User_Account set point = point + 1 where username = '" + user +"'";
+
+    public void addPoint(String user) throws SQLException {
+        String query = "UPDATE User_Account set point = point + 1 where username = '" + user + "'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(query);
     }
-    public boolean Register(UserAccount ua) throws SQLException
-    {
+
+    public boolean Register(UserAccount ua) throws SQLException {
         //check xem co ton tai user hay khong
-        String query = "select username from User_Account where username = '" + ua.getUsername() +"';";
+        String query = "select username from User_Account where username = '" + ua.getUsername() + "';";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
-        if (rs.next()) 
+        if (rs.next()) {
             return false;
+        }
         query = "insert into User_Account(username,password) values ('" + ua.getUsername() + "','" + ua.getPassword() + "');";
         stmt.executeUpdate(query);
         return true;

@@ -22,15 +22,16 @@ import javax.swing.table.TableModel;
  *
  * @author hoang
  */
-public class LobbyForm extends javax.swing.JFrame implements ActionListener{
+public class LobbyForm extends javax.swing.JFrame implements ActionListener {
 
     /**
      * Creates new form LobbyForm
      */
-    private Vector<String> col = new Vector<String>(); 
+    private Vector<String> col = new Vector<String>();    
     private TableModel tablemodel;
     int prevHash = 0;
     private String name;
+
     public LobbyForm() {
         initComponents();
         this.pack();
@@ -44,7 +45,7 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
         col.add("Điểm");
         col.add("Trạng thái");
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         tblUser.setDefaultRenderer(String.class, centerRenderer);
     }
 
@@ -236,16 +237,16 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    public void addLogoutListener(ActionListener log)
-    {
+
+    public void addLogoutListener(ActionListener log) {
         btnLogout.addActionListener(log);
     }
-    public void addChallengeListener(ActionListener log)
-    {
+
+    public void addChallengeListener(ActionListener log) {
         btnChallenge.addActionListener(log);
     }
-    public void setTable(UserTable ut)
-    {
+
+    public void setTable(UserTable ut) {
         /*for (UserTableData i : ut.getListUTD())
         {
             String name = i.getUsername();
@@ -255,12 +256,10 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
             tbm.addRow(data);
         }*/
         Vector<Vector> dVector = new Vector<>();
-        for (UserTableData i : ut.getListUTD())
-        {
+        for (UserTableData i : ut.getListUTD()) {
             String nname = i.getUsername();
             String point = Integer.toString(i.getPoint());
-            if (nname.equals(this.name) && !point.equals(labelPoint.getText()))
-            {
+            if (nname.equals(this.name) && !point.equals(labelPoint.getText())) {
                 labelPoint.setText(point);
             }
             String status = (i.getStatus() == UserTableData.STATUS.ONLINE ? "Online" : "Playing");
@@ -270,29 +269,31 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener{
             v.add(status);
             dVector.add(v);
         }
-        if (dVector.hashCode() == prevHash)
+        if (dVector.hashCode() == prevHash) {
             return;
+        }
         prevHash = dVector.hashCode();
-        DefaultTableModel tbm = (DefaultTableModel)tablemodel;
+        DefaultTableModel tbm = (DefaultTableModel) tablemodel;
         tbm.setDataVector(dVector, col);
     }
-    public void clearTable()
-    {
+
+    public void clearTable() {
         String[] col = {"Người chơi", "Điểm", "Trạng thái"};
-        DefaultTableModel tbm = (DefaultTableModel)tablemodel;
+        DefaultTableModel tbm = (DefaultTableModel) tablemodel;
         tbm.setDataVector(null, col);
     }
-    public void setLabelName(String name)
-    {
+
+    public void setLabelName(String name) {
         this.name = name;
         labelName.setText(name);
     }
-    public String getUserNameSelectedRow()
-    {
+
+    public String getUserNameSelectedRow() {
         int row = -1;
-        if ((row = tblUser.getSelectedRow()) == -1)
+        if ((row = tblUser.getSelectedRow()) == -1) {
             return null;
-        DefaultTableModel tbm = (DefaultTableModel)tablemodel;
-        return (String)(tblUser.getValueAt(row, 0));
+        }
+        DefaultTableModel tbm = (DefaultTableModel) tablemodel;
+        return (String) (tblUser.getValueAt(row, 0));
     }
 }

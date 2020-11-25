@@ -11,7 +11,8 @@ import java.io.Serializable;
  *
  * @author hoang
  */
-public class UserAccount implements Serializable{
+public class UserAccount implements Serializable {
+
     private String username;
     private String password;
 
@@ -38,5 +39,5 @@ public class UserAccount implements Serializable{
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
 }

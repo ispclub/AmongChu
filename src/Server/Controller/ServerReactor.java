@@ -37,7 +37,7 @@ public class ServerReactor extends Thread {
     private List pendingChange = new LinkedList();
     private Map pendingData = new HashMap();
     private ServerTableControl stc;
-    
+
     public ServerReactor(InetAddress interfaceToBind, int port1, int port2, ServerQueueRequest sqr, ServerTableControl stc) throws IOException {
         this.interfaceToBind = interfaceToBind;
         this.port1 = port1;
@@ -110,12 +110,9 @@ public class ServerReactor extends Thread {
                     }
                     if (key.isAcceptable()) {
                         this.accept(key);
-                    }
-                    else if (key.isReadable()) {
+                    } else if (key.isReadable()) {
                         this.read(key);
-                    }
-                    else if (key.isWritable())
-                    {
+                    } else if (key.isWritable()) {
                         this.write(key);
                     }
                 }
@@ -130,8 +127,7 @@ public class ServerReactor extends Thread {
         SocketChannel socketChannel = serverSocketChannel.accept();
         //Socket socket = socketChannel.socket();
         socketChannel.configureBlocking(false);
-        if (socketChannel.socket().getLocalPort()== this.port2)
-        {
+        if (socketChannel.socket().getLocalPort() == this.port2) {
             stc.addToList(socketChannel);
         }
         socketChannel.register(this.selector, SelectionKey.OP_READ);
@@ -148,8 +144,7 @@ public class ServerReactor extends Thread {
         } catch (IOException ex) {
             key.cancel();
             socketChannel.close();
-            if (socketChannel.socket().getLocalPort() == this.port2)
-            {
+            if (socketChannel.socket().getLocalPort() == this.port2) {
                 //remove from ServerTableControl
                 stc.removeFromList(socketChannel);
                 return;
@@ -162,8 +157,7 @@ public class ServerReactor extends Thread {
         if (numRead == -1) {
             key.cancel();
             socketChannel.close();
-            if (socketChannel.socket().getLocalPort() == this.port2)
-            {
+            if (socketChannel.socket().getLocalPort() == this.port2) {
                 //remove from ServerTableControl
                 stc.removeFromList(socketChannel);
                 return;
@@ -178,22 +172,18 @@ public class ServerReactor extends Thread {
 
     private void write(SelectionKey key) throws IOException {
         SocketChannel socketChannel = (SocketChannel) key.channel();
-        synchronized (this.pendingData)
-        {
-            List queue = (List)this.pendingData.get(socketChannel);
-            while (!queue.isEmpty())
-            {
-                ByteBuffer buf = (ByteBuffer)queue.get(0);
+        synchronized (this.pendingData) {
+            List queue = (List) this.pendingData.get(socketChannel);
+            while (!queue.isEmpty()) {
+                ByteBuffer buf = (ByteBuffer) queue.get(0);
                 socketChannel.write(buf);
-                if (buf.remaining() > 0)
-                {
+                if (buf.remaining() > 0) {
                     //some stuf here or raise new exception
                     break;
                 }
                 queue.remove(0);
             }
-            if (queue.isEmpty())
-            {
+            if (queue.isEmpty()) {
                 key.interestOps(SelectionKey.OP_READ);
             }
         }

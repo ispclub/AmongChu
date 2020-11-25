@@ -125,9 +125,11 @@ public class ResponseHandler implements Runnable {
                                     }
                                 }
                             case REGISTER:
-                                if (sm.getStatus() == ServerMessage.STATUS.S_OK)
+                                if (sm.getStatus() == ServerMessage.STATUS.S_OK) {
                                     JOptionPane.showMessageDialog(frameToShow, "Tạo mới tài khoản thành công");
-                                else JOptionPane.showMessageDialog(frameToShow, "Tên tài khoản đã có người sử dụng");
+                                } else {
+                                    JOptionPane.showMessageDialog(frameToShow, "Tên tài khoản đã có người sử dụng");
+                                }
                                 break;
                             default:
                                 break;
@@ -141,5 +143,4 @@ public class ResponseHandler implements Runnable {
             }
         }
     }
-
 }

@@ -13,6 +13,7 @@ import java.sql.SQLException;
  * @author hoang
  */
 public class serverRun {
+
     public static void main(String[] args) throws SQLException, IOException {
         ServerQueueRequest sqr = new ServerQueueRequest();
         ServerTableControl stc = new ServerTableControl();

@@ -14,13 +14,14 @@ import javax.swing.ImageIcon;
  *
  * @author hoang
  */
-public class RequestForm extends javax.swing.JFrame{
+public class RequestForm extends javax.swing.JFrame {
 
     /**
      * Creates new form RequestForm
      */
     private String user;
     private LobbyControl lc;
+
     public RequestForm(LobbyControl lc) {
         initComponents();
         this.pack();
@@ -155,20 +156,18 @@ public class RequestForm extends javax.swing.JFrame{
     private javax.swing.JButton btnReject;
     private javax.swing.JLabel lblMsgToShow;
     // End of variables declaration//GEN-END:variables
-    
-    public void setUser(String msg)
-    {
+
+    public void setUser(String msg) {
         this.user = msg;
-        String request = "Người chơi " + msg + " thách đấu bạn";  
+        String request = "Người chơi " + msg + " thách đấu bạn";
         this.lblMsgToShow.setText(request);
     }
 
-    public String getUser()
-    {
+    public String getUser() {
         return this.user;
     }
-    public void close()
-    {
+
+    public void close() {
         this.dispose();
         try {
             this.finalize();

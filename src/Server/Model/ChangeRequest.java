@@ -48,5 +48,4 @@ public class ChangeRequest {
     public void setOps(int ops) {
         this.ops = ops;
     }
-    
 }

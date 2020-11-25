@@ -46,5 +46,4 @@ public class ServerDataEvent {
     public void setData(byte[] data) {
         this.data = data;
     }
-    
 }

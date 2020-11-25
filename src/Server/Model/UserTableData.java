@@ -11,11 +11,12 @@ import java.io.Serializable;
  *
  * @author hoang
  */
-public class UserTableData implements Serializable{
+public class UserTableData implements Serializable {
+
     private String username;
     private int point;
-    public enum STATUS 
-    {
+
+    public enum STATUS {
         ONLINE,
         PLAYING;
     }
@@ -53,5 +54,5 @@ public class UserTableData implements Serializable{
     public void setStatus(STATUS status) {
         this.status = status;
     }
-    
+
 }

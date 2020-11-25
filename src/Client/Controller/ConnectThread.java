@@ -27,12 +27,14 @@ import javax.swing.JOptionPane;
  *
  * @author hoang
  */
-public class ConnectThread extends Thread{
+public class ConnectThread extends Thread {
+
     private Selector selector;
     private ByteBuffer readBuffer = ByteBuffer.allocate(8192);
     private List pendingChanges = new LinkedList();
     private Map pendingData = new HashMap();
     private ResponseHandler rspHandler;
+
     public ConnectThread(ResponseHandler rspHandler) throws IOException {
         this.rspHandler = rspHandler;
         this.selector = this.initSelector();
@@ -41,26 +43,20 @@ public class ConnectThread extends Thread{
     private Selector initSelector() throws IOException {
         return SelectorProvider.provider().openSelector();
     }
-    
-    public void closeConnect(SocketChannel sc) throws IOException
-    {
-        synchronized (this.pendingChanges)
-        {
+
+    public void closeConnect(SocketChannel sc) throws IOException {
+        synchronized (this.pendingChanges) {
             this.pendingChanges.add(new ChangeRequest(sc, ChangeRequest.CLOSE, 0));
         }
         this.selector.wakeup();
     }
-    
-    public void send(byte[] data, SocketChannel socketChannel)
-    {
-        synchronized (this.pendingChanges)
-        {
+
+    public void send(byte[] data, SocketChannel socketChannel) {
+        synchronized (this.pendingChanges) {
             this.pendingChanges.add(new ChangeRequest(socketChannel, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
-            synchronized (this.pendingData)
-            {
+            synchronized (this.pendingData) {
                 List queue = (List) this.pendingData.get(socketChannel);
-                if (queue == null)
-                {
+                if (queue == null) {
                     queue = new ArrayList();
                     this.pendingData.put(socketChannel, queue);
                 }
@@ -69,20 +65,16 @@ public class ConnectThread extends Thread{
         }
         this.selector.wakeup();
     }
+
     @Override
     public void run() {
-        while (true)
-        {
-            try
-            {
-                synchronized (this.pendingChanges)
-                {
+        while (true) {
+            try {
+                synchronized (this.pendingChanges) {
                     Iterator changes = this.pendingChanges.iterator();
-                    while (changes.hasNext())
-                    {
-                        ChangeRequest change = (ChangeRequest)changes.next();
-                        switch (change.getType())
-                        {
+                    while (changes.hasNext()) {
+                        ChangeRequest change = (ChangeRequest) changes.next();
+                        switch (change.getType()) {
                             case ChangeRequest.CHANGEOPS:
                                 SelectionKey key = change.getSocket().keyFor(this.selector);
                                 key.interestOps(change.getOps());
@@ -92,7 +84,7 @@ public class ConnectThread extends Thread{
                                 break;
                             case ChangeRequest.CLOSE:
                                 change.getSocket().close();
-                                //change.getSocket().keyFor(this.selector).cancel();
+                            //change.getSocket().keyFor(this.selector).cancel();
                         }
                         //ChangeRequest change = (ChangeRequest)changes.next();
                     }
@@ -100,24 +92,19 @@ public class ConnectThread extends Thread{
                 }
                 this.selector.select();
                 Iterator selectedKeys = this.selector.selectedKeys().iterator();
-                while (selectedKeys.hasNext())
-                {
-                    SelectionKey key = (SelectionKey)selectedKeys.next();
+                while (selectedKeys.hasNext()) {
+                    SelectionKey key = (SelectionKey) selectedKeys.next();
                     selectedKeys.remove();
-                    if (!key.isValid())
-                    {
+                    if (!key.isValid()) {
                         continue;
                     }
-                    if (key.isConnectable())
-                    {
+                    if (key.isConnectable()) {
                         this.finishConection(key);
                     }
-                    if (key.isReadable())
-                    {
+                    if (key.isReadable()) {
                         this.read(key);
                     }
-                    if (key.isWritable())
-                    {
+                    if (key.isWritable()) {
                         this.write(key);
                     }
                 }
@@ -146,18 +133,15 @@ public class ConnectThread extends Thread{
         SocketChannel socketChannel = (SocketChannel) key.channel();
         this.readBuffer.clear();
         int numRead;
-        try
-        {
+        try {
             numRead = socketChannel.read(this.readBuffer);
-        }catch (IOException ex)
-        {
+        } catch (IOException ex) {
             key.cancel();
             socketChannel.close();
             //add thông báo here
             return;
         }
-        if (numRead == -1)
-        {
+        if (numRead == -1) {
             key.channel().close();
             key.cancel();
             //add thông báo here
@@ -186,18 +170,15 @@ public class ConnectThread extends Thread{
             }
         }
     }
-    
-    public SocketChannel initConnection(InetAddress hostAddress, int port) throws IOException
-    {
+
+    public SocketChannel initConnection(InetAddress hostAddress, int port) throws IOException {
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.configureBlocking(false);
         socketChannel.connect(new InetSocketAddress(hostAddress, port));
-        synchronized(this.pendingChanges)
-        {
+        synchronized (this.pendingChanges) {
             this.pendingChanges.add(new ChangeRequest(socketChannel, ChangeRequest.REGISTER, SelectionKey.OP_CONNECT));
         }
         this.selector.wakeup();
         return socketChannel;
     }
-    
 }

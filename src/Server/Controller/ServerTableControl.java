@@ -16,17 +16,17 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author hoang
  */
 public class ServerTableControl extends Thread {
+
     private DatabaseManager dbm;
     private Set list;
     private ServerReactor sr;
+
     public ServerTableControl() throws SQLException {
         dbm = new DatabaseManager();
         list = new HashSet();
@@ -42,20 +42,21 @@ public class ServerTableControl extends Thread {
             list.notify();
         }
     }
-    public void removeFromList(SocketChannel socketChannel)
-    {
+
+    public void removeFromList(SocketChannel socketChannel) {
         synchronized (list) {
             list.remove(socketChannel);
             list.notify();
         }
     }
-    private static byte[] serialize(Object obj) throws IOException 
-    {
+
+    private static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
         return out.toByteArray();
     }
+
     @Override
     public void run() {
         ServerDataEvent dataEvent;
@@ -80,9 +81,8 @@ public class ServerTableControl extends Thread {
                     System.out.println(ex);
                 }
                 Iterator it = list.iterator();
-                while (it.hasNext())
-                {
-                    sr.send((SocketChannel)(it.next()),dta);
+                while (it.hasNext()) {
+                    sr.send((SocketChannel) (it.next()), dta);
                 }
             }
         }
