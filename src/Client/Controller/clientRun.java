@@ -27,6 +27,10 @@ public class clientRun {
     private SocketChannel socketChannelTable = null;
     private PikachuController pika = null;
 
+    public SocketChannel getSocketChannelMain() {
+        return socketChannelMain;
+    }
+
     public void setSocketChannelMain(SocketChannel socketChannelMain) {
         this.socketChannelMain = socketChannelMain;
     }
@@ -57,6 +61,11 @@ public class clientRun {
         if (socketChannelTable != null) {
             ct.closeConnect(socketChannelTable);
             socketChannelTable = null;
+        }
+        if (socketChannelMain != null)
+        {
+            ct.closeConnect(socketChannelMain);
+            socketChannelMain = null;
         }
         lc = new LoginControl(ct, this, rsp);
     }

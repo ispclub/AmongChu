@@ -61,7 +61,7 @@ public class LoginControl {
                     }
                     Thread.sleep(1000);
                     cr.setSocketChannelMain(sk);
-                }
+                } else sk = cr.getSocketChannelMain();
                 UserAccount x = lf.getUser();
                 if (x.getUsername().isEmpty() || x.getPassword().isEmpty()) {
                     JOptionPane.showMessageDialog(lf, "Tài khoản hoặc mật khẩu không được để trống");
@@ -84,8 +84,9 @@ public class LoginControl {
                     if ((sk = ct.initConnection(InetAddress.getByName(Utils.host), Utils.port1)) == null) {
                         JOptionPane.showMessageDialog(lf, "Không thể kết nối tới server");
                     }
+                    Thread.sleep(1000);
                     cr.setSocketChannelMain(sk);
-                }
+                } else sk = cr.getSocketChannelMain();
                 UserAccount x = lf.getUser();
                 if (x.getUsername().isEmpty() || x.getPassword().isEmpty()) {
                     JOptionPane.showMessageDialog(lf, "Tài khoản hoặc mật khẩu không được để trống");
