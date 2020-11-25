@@ -124,6 +124,7 @@ public class ResponseHandler implements Runnable {
                                             break;
                                     }
                                 }
+                                break;
                             case REGISTER:
                                 if (sm.getStatus() == ServerMessage.STATUS.S_OK) {
                                     JOptionPane.showMessageDialog(frameToShow, "Tạo mới tài khoản thành công");
