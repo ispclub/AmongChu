@@ -97,14 +97,14 @@ public class ConnectThread extends Thread {
                     selectedKeys.remove();
                     if (!key.isValid()) {
                         continue;
-                    }
-                    if (key.isConnectable()) {
+                    } 
+                    else if (key.isConnectable()) {
                         this.finishConection(key);
-                    }
-                    if (key.isReadable()) {
+                    } 
+                    else if (key.isReadable()) {
                         this.read(key);
                     }
-                    if (key.isWritable()) {
+                    else if (key.isWritable()) {
                         this.write(key);
                     }
                 }
