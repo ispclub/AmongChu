@@ -1,0 +1,32 @@
+Yêu cầu đối với Quyển báo cáo BTL (bản cứng):
+Báo cáo bản cứng 25-30 trang, có đầy đủ các thông tin:
+- Tên đầy đủ của đề tài BTL, danh sách các thành viên, đóng góp của mỗi thành viên tham gia
+Chương mở đầu và chương thiết kế cần đầy đủ thông tin:
+- Giới thiệu ứng dụng/game và Phân tích yêu cầu ứng dụng/hệ thống
+- Phân tích thiết kế tổng quan ứng dụng và Phân tích thiết kế chi tiết ứng dụng bao gồm các nội dung:
++ Kiến trúc tổng quan,
++ Sơ đồ khối các chức năng của Client và của Server,
++ Biểu đồ Usercase tổng quan,
++ Usercase chi tiết,
++ Biểu đồ lớp,
++ Biểu đồ tuần tự,
++ Sơ đồ thực thể quan hệ (ER)
+Kết quả (ứng dụng) ở chương cuối được cần mô tả rõ:
+- Kiến trúc ứng dụng (có thể thể hiện bằng các khối: Server, Client, các User tham gia)
+- Cài đặt và triển khai ứng dụng
+- Các kết quả thực hiện được: tính năng/ chức năng của ứng dụng, kết quả thử nghiệm/triển khai
+- Kết luận, các điểm hạn chế.
+- Tài liệu tham khảo
+Yêu cầu về hình thức (2 trang bắt buộc với các thông tin):
+1. Trang bìa
+- Bìa báo cáo cần đầy đủ thông tin Nhóm (QLĐT) và Nhóm BTL (thiếu một trong hai thông tin sẽ bị trừ điểm)
+- Các thành viên trong nhóm (Họ tên đầy đủ, MSSV)
+2. Trang thành viên tham gia và đóng góp:
+Danh sách các thành viên và nhiệm vụ (đóng góp) cụ thể của mỗi thành viên trong nhóm đối với Bài Tập lớn
+Về trình bầy
+- Trình bầy rõ ràng sáng sủa, khoa học
+- Font chữ Times New Roman cỡ 13 hoặc 14
+- Cần có đầy đủ: Mục lục, từ viết tắt, danh sách hình vẽ, danh sách bảng biểu
+- Căn lề 2 bên
+- Các chương mục rõ ràng
+- In 01 mặt
