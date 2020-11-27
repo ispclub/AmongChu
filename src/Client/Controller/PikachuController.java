@@ -16,6 +16,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -24,6 +26,7 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 /**
@@ -37,6 +40,10 @@ public class PikachuController extends JFrame {
     private int coupleDone;
     private ConnectThread ct;
     private SocketChannel sc;
+    private Timer timer;
+    private int countDown;
+    private ActionListener timeAction;
+    private int score;
 
     public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc) throws HeadlessException {
         super("Quẩy lên bạn ơi");
@@ -68,9 +75,26 @@ public class PikachuController extends JFrame {
         playGameView.setBackgroundImage("../../Resource/bg_" + i + ".png");
 
         coupleDone = 0;
-
-        playGameView.setVisible(true);
-
+        this.timeAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                --countDown;
+                playGameView.updateProgress(countDown);
+                playGameView.updateTimer("Time: " + countDown);
+                if (countDown == 0) {
+                    timer.stop();
+                }
+            }
+        };
+        this.timer = new Timer(1000, timeAction);
+        
+        score = 0;
+        coupleDone = 0;
+        countDown = 120;
+        playGameView.updateMaxProgress(countDown);
+        playGameView.updateScore("Score: "+score);
+        playGameView.updateTimer("Time: "+countDown);
+        timer.start();
         this.playGameView.setPlayGameListener(new PlayGameView.PlayGameListener() {
 
             @Override
@@ -93,7 +117,8 @@ public class PikachuController extends JFrame {
 
                         //Tăng số cặp chọn đúng lên 1
                         coupleDone++;
-
+                        score += 100;
+                        playGameView.updateScore("Score: " + score);
                         if (!matrix.canPlay() && coupleDone < (matrix.getRow() - 2) * (matrix.getCol() - 2) / 2) {
                             JOptionPane.showMessageDialog(null, "Không thể chơi tiếp!");
                             //need reset map here
@@ -116,8 +141,14 @@ public class PikachuController extends JFrame {
                     }
                 }
             }
-        });
 
+            @Override
+            public void onQuitClicked() {
+                //check me
+                
+            }
+        });
+        playGameView.setVisible(true);
         this.add(playGameView, BorderLayout.CENTER);
         setVisible(true);
     }

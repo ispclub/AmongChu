@@ -5,7 +5,6 @@
  */
 package Utils;
 
-import java.net.InetAddress;
 
 /**
  *
@@ -19,6 +18,7 @@ public class Utils {
     public static final int MAP_COL = 10;
     public static final int PIKACHU_NUMBER = 25;
     public static final boolean DEBUG = true;
+    public static final String BT_QUIT = "quit";
     public static final int port1 = 12346;
     public static final int port2 = 12347;
     public static final String host = "34.92.139.146";
