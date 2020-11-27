@@ -350,10 +350,11 @@ public class ServerQueueRequest implements Runnable {
                                 } catch (SQLException ex) {
                                     System.out.println("SQLe when setOnline");
                                 }
-                                SocketChannel sckLoser = (SocketChannel) (clientName.getKey(l));
+                                SocketChannel sckLoser = (SocketChannel) (clientName.get(l));
+                                SocketChannel sckWinner = (SocketChannel) (clientName.get(w));
                                 ServerMessage smgWinner = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, l, ServerMessage.REQUEST.RESULT);
                                 try {
-                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(smgWinner));
+                                    dataEvent.getServerReactor().send(sckWinner, serialize(smgWinner));
                                 } catch (IOException ex) {
                                     System.out.println("Fail send winner");
                                 }
