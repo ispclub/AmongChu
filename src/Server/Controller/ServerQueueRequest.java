@@ -312,7 +312,7 @@ public class ServerQueueRequest implements Runnable {
                                 }
                                 try {
                                     dbm.addPoint(Winner);
-                                    dbm.setOnline(Winner);
+                                    dbm.setOnline(Winner,Loser);
                                 } catch (SQLException ex) {
                                     System.out.println("Except khi add point khi force close");
                                 }
@@ -321,7 +321,7 @@ public class ServerQueueRequest implements Runnable {
                             }
                             removeFromRequestMap(user);
                             clientName.removeValue(dataEvent.getSocket());
-                            System.out.println("Client đăng xuất thành công");
+                            System.out.println("Client " + user + " đã thoát game!");
                             break;
                         default:
                             break;
