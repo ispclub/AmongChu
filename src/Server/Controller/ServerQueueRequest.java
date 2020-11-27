@@ -339,6 +339,7 @@ public class ServerQueueRequest implements Runnable {
                                     
                                 }
                                 String l = m.getOther(w);
+                                Utils.debug(getClass(), "Game " + w + " " + l);
                                 try {
                                     dbm.addPoint(w);
                                 } catch (SQLException ex) {
