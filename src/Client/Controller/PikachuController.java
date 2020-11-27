@@ -87,6 +87,13 @@ public class PikachuController extends JFrame {
                 playGameView.updateTimer("Time: " + countDown);
                 if (countDown == 0) {
                     timer.stop();
+                    Integer i = new Integer(score);
+                    try {
+                        ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.MATCH, i);
+                        ct.send(serialize(cm), sc);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(null, "Gửi điểm thất bại!");
+                    }
                 }
             }
         };

@@ -6,6 +6,7 @@
 package Server.Controller;
 
 import Client.Model.Matrix;
+import Server.Model.Match;
 import Server.Model.Message.ClientMessage;
 import Server.Model.Message.ServerMessage;
 import Server.Model.ServerDataEvent;
@@ -135,7 +136,7 @@ public class ServerQueueRequest implements Runnable {
                     System.out.println("Set Logout thất bại");
                 }
                 if (runningGame.get(user) != null) {
-                    String winner = (String) runningGame.get(user);
+                    String winner = ((Match) runningGame.get(user)).getOther(user);
                     String loser = new String(user);
                     SocketChannel winnerSocket = (SocketChannel) clientName.getKey(winner);
                     ServerMessage sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, loser, ServerMessage.REQUEST.RESULT);
@@ -216,17 +217,18 @@ public class ServerQueueRequest implements Runnable {
                                             // check if the userToChallenge is the one who request first
                                             if (needCreateMatch(currentUser, userToChallenge)) {
                                                 //Create a match here
-                                                runningGame.put(currentUser, userToChallenge);
-                                                runningGame.put(userToChallenge, currentUser);
+                                                Match match = new Match(currentUser, userToChallenge);
+                                                runningGame.put(currentUser, match);
+                                                runningGame.put(userToChallenge, match);
                                                 Matrix matrix = new Matrix(Utils.MAP_ROW, Utils.MAP_COL);
                                                 matrix.renderMatrix();
                                                 SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
                                                 sm = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, matrix, ServerMessage.REQUEST.CHALLENGE);
-                                                byte[] match = serialize(sm);
+                                                byte[] Match = serialize(sm);
                                                 dbm.setPlaying(currentUser, userToChallenge);
                                                 // gửi cho cả 2
-                                                dataEvent.getServerReactor().send(sc, match);
-                                                dataEvent.getServerReactor().send(dataEvent.getSocket(), match);
+                                                dataEvent.getServerReactor().send(sc, Match);
+                                                dataEvent.getServerReactor().send(dataEvent.getSocket(), Match);
                                                 System.out.println("Tạo trận đấu");
                                             } else {
                                                 SocketChannel sc = (SocketChannel) (clientName.getKey(userToChallenge));
@@ -252,7 +254,7 @@ public class ServerQueueRequest implements Runnable {
                             break;
                         case WIN:
                             String winner = (String) (clientName.get(dataEvent.getSocket()));
-                            String loser = (String) (runningGame.get(winner));
+                            String loser = ((Match) runningGame.get(winner)).getOther(winner);
                             try {
                                 dbm.addPoint(winner);
                             } catch (SQLException ex) {
@@ -301,7 +303,7 @@ public class ServerQueueRequest implements Runnable {
                         case QUIT:
                             String user = (String) (clientName.get(dataEvent.getSocket()));
                             if (runningGame.get(user) != null) {
-                                String Winner = (String) runningGame.get(user);
+                                String Winner = ((Match) runningGame.get(user)).getOther(user);;
                                 String Loser = new String(user);
                                 SocketChannel winnerSocket = (SocketChannel) clientName.getKey(Winner);
                                 ServerMessage Sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, Loser, ServerMessage.REQUEST.RESULT);
@@ -322,6 +324,47 @@ public class ServerQueueRequest implements Runnable {
                             removeFromRequestMap(user);
                             clientName.removeValue(dataEvent.getSocket());
                             System.out.println("Client " + user + " đã thoát game!");
+                            break;
+                        case MATCH:
+                            String curUser = (String) (clientName.get(dataEvent.getSocket()));
+                            Match m = (Match) runningGame.get(curUser);
+                            int i = ((Integer)(cm.getData()));
+                            m.setPoint(curUser, i);
+                            String w;
+                            if ((w = m.getWinner()) != null)
+                            {
+                                if (w.equals("\n"))
+                                {
+                                    //hoa
+                                    
+                                }
+                                String l = m.getOther(w);
+                                try {
+                                    dbm.addPoint(w);
+                                } catch (SQLException ex) {
+                                    System.out.println("Fail when add point");
+                                }
+                                try {
+                                    dbm.setOnline(l, w);
+                                } catch (SQLException ex) {
+                                    System.out.println("SQLe when setOnline");
+                                }
+                                SocketChannel sckLoser = (SocketChannel) (clientName.getKey(l));
+                                ServerMessage smgWinner = new ServerMessage(ServerMessage.STATUS.S_OK, ServerMessage.ACTION.NONE, l, ServerMessage.REQUEST.RESULT);
+                                try {
+                                    dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(smgWinner));
+                                } catch (IOException ex) {
+                                    System.out.println("Fail send winner");
+                                }
+                                ServerMessage smgLoser = new ServerMessage(ServerMessage.STATUS.S_FAIL, ServerMessage.ACTION.NONE, w, ServerMessage.REQUEST.RESULT);
+                                try {
+                                    dataEvent.getServerReactor().send(sckLoser, serialize(smgLoser));
+                                } catch (IOException ex) {
+                                    System.out.println("Fail send loser");
+                                }
+                                runningGame.remove(w);
+                                runningGame.remove(l);
+                            }
                             break;
                         default:
                             break;
