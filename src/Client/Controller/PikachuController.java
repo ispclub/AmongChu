@@ -91,6 +91,7 @@ public class PikachuController extends JFrame {
                     try {
                         ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.MATCH, i);
                         ct.send(serialize(cm), sc);
+                        Utils.debug(getClass(), "send point" + i.toString());
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, "Gửi điểm thất bại!");
                     }
