@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -44,10 +46,12 @@ public class PikachuController extends JFrame {
     private int countDown;
     private ActionListener timeAction;
     private int score;
+    private clientRun cr;
 
-    public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc) throws HeadlessException {
+    public PikachuController(Matrix maxtrix, ConnectThread ct, SocketChannel sc, clientRun cr) throws HeadlessException {
         super("Quẩy lên bạn ơi");
         this.ct = ct;
+        this.cr = cr;
         this.sc = sc;
         Image icon = (new ImageIcon(getClass().getResource("../../Resource/Pikamong.png"))).getImage();
         setIconImage(icon);
@@ -131,7 +135,7 @@ public class PikachuController extends JFrame {
                             try {
                                 ct.send(serialize(cm), sc);
                             } catch (IOException ex) {
-                                System.out.println("Serialize thất bại");
+                                JOptionPane.showMessageDialog(null, "Serialize thất bại!");
                             }
                         }
                     } else {
@@ -144,8 +148,13 @@ public class PikachuController extends JFrame {
 
             @Override
             public void onQuitClicked() {
-                //check me
-                
+                ClientMessage cm = new ClientMessage(ClientMessage.REQUEST.QUIT, null);
+                try {
+                    ct.send(serialize(cm), sc);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Thoát không thành công!");
+                }
+                cr.forceBackToLobby();
             }
         });
         playGameView.setVisible(true);

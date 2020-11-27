@@ -79,7 +79,7 @@ public class clientRun {
     }
 
     public void toGame(Matrix matrix) {
-        pika = new PikachuController(matrix, ct, socketChannelMain);
+        pika = new PikachuController(matrix, ct, socketChannelMain, this);
         pika.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         pika.setLocationRelativeTo(null);
         pika.start();

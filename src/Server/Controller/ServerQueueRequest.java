@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
@@ -299,6 +297,31 @@ public class ServerQueueRequest implements Runnable {
                             } catch (IOException ex) {
                                 System.out.println("Gửi thông tin create new account thất bại 2");
                             }
+                            break;
+                        case QUIT:
+                            String user = (String) (clientName.get(dataEvent.getSocket()));
+                            if (runningGame.get(user) != null) {
+                                String Winner = (String) runningGame.get(user);
+                                String Loser = new String(user);
+                                SocketChannel winnerSocket = (SocketChannel) clientName.getKey(Winner);
+                                ServerMessage Sm = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.NONE, Loser, ServerMessage.REQUEST.RESULT);
+                                try {
+                                    dataEvent.getServerReactor().send(winnerSocket, serialize(Sm));
+                                } catch (IOException ex) {
+                                    System.out.println("Gửi response force close thất bại");
+                                }
+                                try {
+                                    dbm.addPoint(Winner);
+                                    dbm.setOnline(Winner);
+                                } catch (SQLException ex) {
+                                    System.out.println("Except khi add point khi force close");
+                                }
+                                runningGame.remove(Winner);
+                                runningGame.remove(user);
+                            }
+                            removeFromRequestMap(user);
+                            clientName.removeValue(dataEvent.getSocket());
+                            System.out.println("Client đăng xuất thành công");
                             break;
                         default:
                             break;
