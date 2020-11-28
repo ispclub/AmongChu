@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class UserTableData implements Serializable {
 
     private String username;
-    private int point;
+    private float point;
 
     public enum STATUS {
         ONLINE,
@@ -35,7 +35,7 @@ public class UserTableData implements Serializable {
         return username;
     }
 
-    public int getPoint() {
+    public float getPoint() {
         return point;
     }
 
@@ -47,7 +47,7 @@ public class UserTableData implements Serializable {
         this.username = username;
     }
 
-    public void setPoint(int point) {
+    public void setPoint(float point) {
         this.point = point;
     }
 

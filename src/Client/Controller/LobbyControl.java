@@ -55,12 +55,18 @@ public class LobbyControl {
         return out.toByteArray();
     }
 
-    public void show(String user, boolean status) {
-        String msg;
-        if (status) {
+    public void show(String user, int status) {
+        String msg = "";
+        if (status == 1) {
             msg = "Bạn đã chiến thắng " + user + ", bạn có muốn đấu lại?";
-        } else {
+        } 
+        else if (status == -1)
+        {
             msg = "Bạn đã thua " + user + ", bạn có muốn đấu lại?";
+        }
+        else if (status == 0)
+        {
+            msg = "Bạn đã hòa " + user + ", bạn có muốn đấu lại?";
         }
         int choice = JOptionPane.showConfirmDialog(lf, msg, "AmongChu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) {

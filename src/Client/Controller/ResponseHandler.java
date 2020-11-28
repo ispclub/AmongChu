@@ -110,15 +110,19 @@ public class ResponseHandler implements Runnable {
                                     switch (sm.getStatus()) {
                                         case S_OK:
                                             //JOptionPane.showMessageDialog(null, "Bạn đã chiến thắng " + sm.getData());
-                                            main.backToLobby((String) sm.getData(), true);
+                                            main.backToLobby((String) sm.getData(), 1);
                                             break;
                                         case S_FAIL:
                                             //JOptionPane.showMessageDialog(null, "Bạn đã thua " + sm.getData());
-                                            main.backToLobby((String) sm.getData(), false);
+                                            main.backToLobby((String) sm.getData(), -1);
                                             break;
                                         case S_WARN:
-                                            JOptionPane.showMessageDialog(null, "Người chơi " + sm.getData() + " đã thoát");
-                                            main.forceBackToLobby();
+                                            if (sm.getAction() == ServerMessage.ACTION.NONE) {
+                                                JOptionPane.showMessageDialog(null, "Người chơi " + sm.getData() + " đã thoát");
+                                                main.forceBackToLobby();
+                                            } else {
+                                                main.backToLobby((String) sm.getData(), 0);
+                                            }
                                             break;
                                         default:
                                             break;

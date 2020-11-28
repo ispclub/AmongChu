@@ -258,7 +258,7 @@ public class LobbyForm extends javax.swing.JFrame implements ActionListener {
         Vector<Vector> dVector = new Vector<>();
         for (UserTableData i : ut.getListUTD()) {
             String nname = i.getUsername();
-            String point = Integer.toString(i.getPoint());
+            String point = Float.toString(i.getPoint());
             if (nname.equals(this.name) && !point.equals(labelPoint.getText())) {
                 labelPoint.setText(point);
             }

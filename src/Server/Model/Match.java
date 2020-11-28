@@ -65,4 +65,12 @@ public class Match implements Serializable{
             return player_2;
         return player_1;
     }
+
+    public String getPlayer_1() {
+        return player_1;
+    }
+
+    public String getPlayer_2() {
+        return player_2;
+    }
 }

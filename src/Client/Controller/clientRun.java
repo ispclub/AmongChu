@@ -85,7 +85,7 @@ public class clientRun {
         pika.start();
     }
 
-    public void backToLobby(String user, boolean status) {
+    public void backToLobby(String user, int status) {
         if (pika != null) {
             pika.close();
             pika = null;

@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 
@@ -319,7 +321,7 @@ public class ServerQueueRequest implements Runnable {
                                     System.out.println("Except khi add point khi force close");
                                 }
                                 runningGame.remove(Winner);
-                                runningGame.remove(user);
+                                runningGame.remove(Loser);
                             }
                             removeFromRequestMap(user);
                             clientName.removeValue(dataEvent.getSocket());
@@ -336,7 +338,25 @@ public class ServerQueueRequest implements Runnable {
                                 if (w.equals("\n"))
                                 {
                                     //hoa
-                                    
+                                    String otherUser = m.getOther(curUser);
+                                    SocketChannel otherSck = (SocketChannel)(clientName.getKey(otherUser));
+                                    try {
+                                        dbm.draw(curUser, otherUser);
+                                        dbm.setOnline(curUser, otherUser);
+                                    } catch (SQLException ex) {
+                                        System.out.println("Set draw thất bại!");
+                                    }
+                                    ServerMessage drawMsgMe = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.MESSAGE_BOX, otherUser, ServerMessage.REQUEST.RESULT);
+                                    ServerMessage drawMsgOther = new ServerMessage(ServerMessage.STATUS.S_WARN, ServerMessage.ACTION.MESSAGE_BOX, curUser, ServerMessage.REQUEST.RESULT);
+                                    try {
+                                        dataEvent.getServerReactor().send(dataEvent.getSocket(), serialize(drawMsgMe));
+                                        dataEvent.getServerReactor().send(otherSck, serialize(drawMsgOther));
+                                    } catch (IOException ex) {
+                                        System.out.println("Gửi msg hòa thất bại");
+                                    }
+                                    runningGame.remove(curUser);
+                                    runningGame.remove(otherUser);
+                                    break;
                                 }
                                 String l = m.getOther(w);
                                 Utils.debug(getClass(), "Game " + w + " " + l);

@@ -78,7 +78,7 @@ public class DatabaseManager {
         while (rs.next()) {
             UserTableData utd = new UserTableData();
             utd.setUsername(rs.getString(1));
-            utd.setPoint(rs.getInt(2));
+            utd.setPoint(rs.getFloat(2));
             utd.setStatus(rs.getBoolean(3) ? UserTableData.STATUS.PLAYING : UserTableData.STATUS.ONLINE);
             ut.addElement(utd);
         }
@@ -135,5 +135,13 @@ public class DatabaseManager {
         query = "insert into User_Account(username,password) values ('" + ua.getUsername() + "','" + ua.getPassword() + "');";
         stmt.executeUpdate(query);
         return true;
+    }
+    public void draw(String user1, String user2) throws SQLException
+    {
+        String query = "UPDATE User_Account set point = point + 0.5 where username = '" + user1 + "'";
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+        query = "UPDATE User_Account set point = point + 0.5 where username = '" + user2 + "'";
+        stmt.executeUpdate(query);
     }
 }
