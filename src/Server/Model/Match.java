@@ -61,8 +61,6 @@ public class Match implements Serializable{
             return null;
         if (player_1.isEmpty() || player_2.isEmpty())
             return null;
-        if (score_1 * score_2 == 0)
-            return null;
         if (score_1 == score_2)
             return (String)"\n";
         return (score_1 > score_2 ? player_1 : player_2);
