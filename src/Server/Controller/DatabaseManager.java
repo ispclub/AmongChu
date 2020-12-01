@@ -94,7 +94,7 @@ public class DatabaseManager {
     }
 
     public boolean checkIsPlaying(String user) throws SQLException {
-        String query = "select username from User_Account where isPlaying = TRUE;";
+        String query = "select username from User_Account where (isPlaying = TRUE and username = '" + user + "');";
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
         return rs.next();
