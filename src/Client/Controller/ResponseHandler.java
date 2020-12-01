@@ -6,7 +6,7 @@
 package Client.Controller;
 
 import Client.Model.ClientDataEvent;
-import Client.Model.Matrix;
+import Server.Model.Matrix;
 import Client.View.LobbyForm;
 import Client.View.LoginForm;
 import Server.Model.Message.ServerMessage;

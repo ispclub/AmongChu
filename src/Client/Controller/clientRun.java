@@ -5,7 +5,7 @@
  */
 package Client.Controller;
 
-import Client.Model.Matrix;
+import Server.Model.Matrix;
 import Server.Model.UserTable;
 import Utils.Utils;
 import static Utils.Utils.WINDOW_HEIGHT;

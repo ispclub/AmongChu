@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Client.Model;
+package Server.Model;
 
 /**
  *
  * @author hoang
  */
-import Client.View.Pikachu;
+import Client.Model.Pikachu;
 import Utils.Utils;
 import static Utils.Utils.PIKACHU_NUMBER;
 import java.io.Serializable;

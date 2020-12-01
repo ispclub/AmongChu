@@ -5,7 +5,7 @@
  */
 package Server.Controller;
 
-import Client.Model.Matrix;
+import Server.Model.Matrix;
 import Server.Model.Match;
 import Server.Model.Message.ClientMessage;
 import Server.Model.Message.ServerMessage;

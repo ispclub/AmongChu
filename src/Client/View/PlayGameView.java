@@ -1,5 +1,6 @@
 package Client.View;
 
+import Client.Model.Pikachu;
 import Utils.Utils;
 import static Utils.Utils.BT_QUIT;
 

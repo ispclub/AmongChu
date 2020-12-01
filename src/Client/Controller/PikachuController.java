@@ -5,8 +5,8 @@
  */
 package Client.Controller;
 
-import Client.Model.Matrix;
-import Client.View.Pikachu;
+import Server.Model.Matrix;
+import Client.Model.Pikachu;
 import Client.View.PlayGameView;
 import Server.Model.Message.ClientMessage;
 import Utils.Utils;
